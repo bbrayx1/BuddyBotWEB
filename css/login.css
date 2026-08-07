@@ -1,0 +1,192 @@
+/* =========================
+   LOGIN PAGE - REDISEÑO
+   ========================= */
+
+.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+    position: relative;
+
+    /* Fondo Galaxy */
+    background: url("../assets/backgrounds/galaxy.png") center center / cover no-repeat;
+}
+
+/* Overlay sutil para mejorar contraste del card */
+.login-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.55) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.login-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 440px;
+    padding: 20px;
+}
+
+/* CARD PRINCIPAL */
+.login-card {
+    background: rgba(12, 14, 22, 0.88);
+    border: 1px solid rgba(0, 213, 255, 0.35);
+    border-radius: 18px;
+    padding: 48px 36px 40px;
+    box-shadow:
+        0 25px 60px rgba(0, 0, 0, 0.75),
+        0 0 0 1px rgba(0, 213, 255, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+}
+
+/* HEADER */
+.login-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.login-logo {
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    border: 2px solid #00d5ff;
+    margin: 0 auto 18px;
+    box-shadow:
+        0 0 0 6px rgba(0, 213, 255, 0.12),
+        0 0 28px rgba(0, 213, 255, 0.45);
+    object-fit: cover;
+    display: block;
+}
+
+.login-header h2 {
+    font-family: 'Audiowide', cursive;
+    font-size: 1.7rem;
+    margin: 0 0 10px;
+    color: #00d5ff;
+    letter-spacing: 2px;
+    text-shadow: 0 0 18px rgba(0, 213, 255, 0.5);
+}
+
+.login-header p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #a8b2c8;
+    letter-spacing: 0.3px;
+}
+
+/* FORM */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    color: #7a8499;
+    font-size: 1.15rem;
+    transition: color 0.25s ease;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 16px 16px 16px 48px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    color: #f0f4ff;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.25s ease;
+}
+
+.input-group input::placeholder {
+    color: #6b7280;
+}
+
+.input-group input:focus {
+    border-color: #00d5ff;
+    background: rgba(0, 20, 35, 0.6);
+    box-shadow: 0 0 0 3px rgba(0, 213, 255, 0.18);
+}
+
+.input-group input:focus + .input-icon,
+.input-group input:not(:placeholder-shown) + .input-icon {
+    color: #00d5ff;
+}
+
+/* BOTÓN */
+.btn-submit {
+    background: linear-gradient(90deg, #00d5ff 0%, #0099cc 100%);
+    color: #020617;
+    border: none;
+    padding: 16px;
+    border-radius: 10px;
+    font-family: 'Audiowide', cursive;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 8px 24px rgba(0, 213, 255, 0.35);
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 213, 255, 0.5);
+    filter: brightness(1.08);
+}
+
+.btn-submit:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.btn-submit:disabled {
+    background: #3f3f46;
+    color: #a1a1aa;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    filter: none;
+}
+
+/* FOOTER */
+.login-footer {
+    margin-top: 32px;
+    text-align: center;
+}
+
+.back-link {
+    color: #8b95a8;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.back-link:hover {
+    color: #ff4d9e; /* neon magenta */
+}
