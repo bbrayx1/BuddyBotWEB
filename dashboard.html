@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | BuddyBotWEB</title>
+    <!-- Estilos Globales -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Estilos específicos del Dashboard -->
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="dashboard-body">
+    <!-- Fondo espacial -->
+    <div class="space-background" style="opacity: 0.2; animation: none; position: fixed;"></div>
+
+    <div class="dashboard-layout">
+        <!-- Panel Izquierdo (Menú Lateral) -->
+        <aside class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <span class="logo-text">BuddyBot</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-btn active" onclick="showView('view-home', this)">
+                    <i class="fas fa-home"></i> Inicio / Stats
+                </button>
+                <button class="nav-btn" onclick="showView('view-add', this)">
+                    <i class="fas fa-map-marker-alt"></i> Añadir Coordenadas
+                </button>
+                <button class="nav-btn" onclick="showView('view-extract-player', this)">
+                    <i class="fas fa-crosshairs"></i> Extraer Jugador
+                </button>
+                <button class="nav-btn" onclick="showView('view-extract-alliance', this)">
+                    <i class="fas fa-users"></i> Extraer Alianza
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png" alt="Avatar" id="userAvatar">
+                    <span id="userName">Comandante</span>
+                </div>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Salir</button>
+            </div>
+        </aside>
+
+        <!-- Panel Central (Vistas Dinámicas) -->
+        <main class="main-content">
+            
+            <!-- VISTA 1: INICIO / ESTADÍSTICAS -->
+            <section id="view-home" class="dashboard-view active">
+                <h2 class="view-title">Resumen de Inteligencia</h2>
+                <div class="stats-grid">
+                    <div class="stat-card glass-panel">
+                        <i class="fas fa-database stat-icon" style="color: var(--neon-cyan);"></i>
+                        <h3>Bases 9</h3>
+                        <p class="stat-value">14</p>
+                    </div>
+                    <div class="stat-card glass-panel">
+                        <i class="fas fa-server stat-icon" style="color: var(--neon-magenta);"></i>
+                        <h3>Bases 8</h3>
+                        <p class="stat-value">22</p>
+                    </div>
+                    <div class="stat-card glass-panel">
+                        <i class="fas fa-users-cog stat-icon" style="color: #a3e635;"></i>
+                        <h3>Jugadores Registrados</h3>
+                        <p class="stat-value">45</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VISTA 2: AGREGAR COORDENADAS -->
+            <section id="view-add" class="dashboard-view hidden">
+                <h2 class="view-title">Registrar Nuevo Objetivo</h2>
+                <div class="form-container glass-panel">
+                    <div class="input-group">
+                        <label>Jugador (Búsqueda API):</label>
+                        <input type="text" id="add-player-name" placeholder="Ej: bazeslow" onkeyup="debounceSearch(this.value)">
+                        <div id="search-results" class="search-results hidden">
+                            <!-- Resultados simulados de la búsqueda API -->
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>Colonia:</label>
+                            <select id="colony-type" class="neon-select">
+                                <option value="main">Main Base</option>
+                                <option value="1st">1st Colony</option>
+                                <option value="2nd">2nd Colony</option>
+                                <option value="3rd">3rd Colony</option>
+                                <option value="4th">4th Colony</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Coordenada X:</label>
+                            <input type="number" id="coord-x" placeholder="X">
+                        </div>
+                        <div class="input-group">
+                            <label>Coordenada Y:</label>
+                            <input type="number" id="coord-y" placeholder="Y">
+                        </div>
+                    </div>
+                    <button class="btn-submit" onclick="saveCoordinates()">
+                        <i class="fas fa-save"></i> Guardar en Base de Datos
+                    </button>
+                    <div id="add-alert" class="alert-success hidden">✅ Coordenada guardada con éxito en Google Sheets.</div>
+                </div>
+            </section>
+
+            <!-- VISTA 3: EXTRAER JUGADOR -->
+            <section id="view-extract-player" class="dashboard-view hidden">
+                <h2 class="view-title">Radar de Jugador</h2>
+                <div class="glass-panel">
+                    <div class="input-group search-bar-group">
+                        <input type="text" placeholder="Ingresa el nombre del jugador para extraer..." id="extract-player-input">
+                        <button class="btn-submit" onclick="extractPlayer()"><i class="fas fa-search"></i> Rastrear</button>
+                    </div>
+                    
+                    <div id="player-table-container" class="hidden mt-20">
+                        <div class="visual-player-card mb-20" style="width: fit-content;">
+                            <img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png" alt="avatar" class="visual-avatar">
+                            <div class="visual-info">
+                                <h3 id="extracted-player-name">Bazeslow</h3>
+                                <span class="visual-badge"><i class="fas fa-shield-alt"></i> Revelations</span>
+                            </div>
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Colonia</th>
+                                    <th>X</th>
+                                    <th>Y</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="colony-badge">Main Base</span></td>
+                                    <td>125</td>
+                                    <td>-450</td>
+                                    <td><button class="icon-btn-danger"><i class="fas fa-trash"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="colony-badge">1st Colony</span></td>
+                                    <td>12</td>
+                                    <td>89</td>
+                                    <td><button class="icon-btn-danger"><i class="fas fa-trash"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VISTA 4: EXTRAER ALIANZA -->
+            <section id="view-extract-alliance" class="dashboard-view hidden">
+                <h2 class="view-title">Radar de Alianza</h2>
+                <div class="glass-panel">
+                    <div class="input-group search-bar-group">
+                        <input type="text" placeholder="Ingresa el nombre de la alianza..." id="extract-alliance-input">
+                        <button class="btn-submit" onclick="extractAlliance()"><i class="fas fa-users"></i> Escanear</button>
+                    </div>
+                    
+                    <div id="alliance-table-container" class="hidden mt-20">
+                        <button class="btn-submit mb-20" style="width: max-content; background: #27c93f; color: black;"><i class="fas fa-file-export"></i> Exportar a TXT</button>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Jugador</th>
+                                    <th>Main</th>
+                                    <th>1st Col</th>
+                                    <th>2nd Col</th>
+                                    <th>3rd Col</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="highlight-cyan">Bazeslow</td>
+                                    <td>125, -450</td>
+                                    <td>12, 89</td>
+                                    <td>--</td>
+                                    <td>--</td>
+                                </tr>
+                                <tr>
+                                    <td class="highlight-cyan">Comandante</td>
+                                    <td>0, 0</td>
+                                    <td>100, 200</td>
+                                    <td>300, -150</td>
+                                    <td>--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- SCRIPT DE NAVEGACIÓN SPA Y LÓGICA -->
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>
