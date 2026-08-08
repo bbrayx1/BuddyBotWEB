@@ -3,202 +3,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | BuddyBotWEB</title>
-    <!-- Estilos Globales -->
-    <link rel="stylesheet" href="css/style.css">
-    <!-- Estilos específicos del Dashboard -->
+    <title>Dashboard - BuddyBotWEB</title>
+    
+    <!-- Fuentes y Estilos -->
+    <link rel="stylesheet" href="css/style.css"> 
     <link rel="stylesheet" href="css/dashboard.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Librería para el gráfico de barras -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Librería para arrastrar y hacer zoom en el mapa de la galaxia -->
+    <script src="https://cdn.jsdelivr.net/npm/@panzoom/panzoom/dist/panzoom.min.js"></script>
 </head>
-<body class="dashboard-body">
-    <!-- Fondo espacial -->
-    <div class="space-background" style="opacity: 0.2; animation: none; position: fixed;"></div>
+<body>
 
-    <div class="dashboard-layout">
-        <!-- Panel Izquierdo (Menú Lateral) -->
-        <aside class="sidebar glass-panel">
-            <div class="sidebar-header">
-                <span class="logo-text">BuddyBot</span>
+    <!-- ================= NAVBAR SUPERIOR (Herramientas) ================= -->
+    <nav class="top-navbar">
+        <div class="nav-left">
+            <!-- Buscador de jugadores -->
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="Buscar jugador..." autocomplete="off">
+                <span class="clear-icon" id="clearSearch">✕</span>
             </div>
             
-            <nav class="sidebar-nav">
-                <button class="nav-btn active" onclick="showView('view-home', this)">
-                    <i class="fas fa-home"></i> Inicio / Stats
-                </button>
-                <button class="nav-btn" onclick="showView('view-add', this)">
-                    <i class="fas fa-map-marker-alt"></i> Añadir Coordenadas
-                </button>
-                <button class="nav-btn" onclick="showView('view-extract-player', this)">
-                    <i class="fas fa-crosshairs"></i> Extraer Jugador
-                </button>
-                <button class="nav-btn" onclick="showView('view-extract-alliance', this)">
-                    <i class="fas fa-users"></i> Extraer Alianza
-                </button>
-            </nav>
+            <!-- Lista desplegable flotante para resultados rápidos del buscador -->
+            <div id="searchDropdown" class="search-dropdown"></div>
+        </div>
 
-            <div class="sidebar-footer">
-                <div class="user-profile">
-                    <img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png" alt="Avatar" id="userAvatar">
-                    <span id="userName">Comandante</span>
-                </div>
-                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Salir</button>
-            </div>
-        </aside>
-
-        <!-- Panel Central (Vistas Dinámicas) -->
-        <main class="main-content">
+        <div class="nav-right">
+            <button id="addCoordsMenuBtn" class="nav-btn">Añadir Coordenadas</button>
+            <button id="getCoordsMenuBtn" class="nav-btn">Obtener Coordenadas</button>
             
-            <!-- VISTA 1: INICIO / ESTADÍSTICAS -->
-            <section id="view-home" class="dashboard-view active">
-                <h2 class="view-title">Resumen de Inteligencia</h2>
-                <div class="stats-grid">
-                    <div class="stat-card glass-panel">
-                        <i class="fas fa-database stat-icon" style="color: var(--neon-cyan);"></i>
-                        <h3>Bases 9</h3>
-                        <p class="stat-value">14</p>
-                    </div>
-                    <div class="stat-card glass-panel">
-                        <i class="fas fa-server stat-icon" style="color: var(--neon-magenta);"></i>
-                        <h3>Bases 8</h3>
-                        <p class="stat-value">22</p>
-                    </div>
-                    <div class="stat-card glass-panel">
-                        <i class="fas fa-users-cog stat-icon" style="color: #a3e635;"></i>
-                        <h3>Jugadores Registrados</h3>
-                        <p class="stat-value">45</p>
-                    </div>
-                </div>
-            </section>
+            <img src="assets/backgrounds/galaxy.png" alt="Logo" class="nav-logo">
+            <button id="logoutBtn" class="nav-btn-logout">Logout</button>
+        </div>
+    </nav>
 
-            <!-- VISTA 2: AGREGAR COORDENADAS -->
-            <section id="view-add" class="dashboard-view hidden">
-                <h2 class="view-title">Registrar Nuevo Objetivo</h2>
-                <div class="form-container glass-panel">
-                    <div class="input-group">
-                        <label>Jugador (Búsqueda API):</label>
-                        <input type="text" id="add-player-name" placeholder="Ej: bazeslow" onkeyup="debounceSearch(this.value)">
-                        <div id="search-results" class="search-results hidden">
-                            <!-- Resultados simulados de la búsqueda API -->
-                        </div>
+    <!-- ================= CONTENIDO PRINCIPAL ================= -->
+    <main id="app-content" class="dashboard-content">
+        
+        <!-- ================= VISTA 1: INICIO (Dashboard Principal) ================= -->
+        <section id="view-home" class="view-section active">
+            
+            <!-- 1. Gráfico de Bases (Barras + Imágenes abajo) -->
+            <div class="dashboard-panel chart-panel">
+                <h2 class="panel-title">Distribución de Bases de Jugadores</h2>
+                <div class="chart-wrapper">
+                    <!-- Canvas para las barras -->
+                    <canvas id="basesChart"></canvas>
+                    <!-- Contenedor para las imágenes de las bases (sb4 a sb9) -->
+                    <div id="basesImagesRow" class="bases-images-row">
+                        <img src="assets/bases/starbase_4.png" alt="SB4">
+                        <img src="assets/bases/starbase_5.png" alt="SB5">
+                        <img src="assets/bases/starbase_6.png" alt="SB6">
+                        <img src="assets/bases/starbase_7.png" alt="SB7">
+                        <img src="assets/bases/starbase_8.png" alt="SB8">
+                        <img src="assets/bases/starbase_9.png" alt="SB9">
                     </div>
-                    <div class="form-row">
-                        <div class="input-group">
-                            <label>Colonia:</label>
-                            <select id="colony-type" class="neon-select">
-                                <option value="main">Main Base</option>
-                                <option value="1st">1st Colony</option>
-                                <option value="2nd">2nd Colony</option>
-                                <option value="3rd">3rd Colony</option>
-                                <option value="4th">4th Colony</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label>Coordenada X:</label>
-                            <input type="number" id="coord-x" placeholder="X">
-                        </div>
-                        <div class="input-group">
-                            <label>Coordenada Y:</label>
-                            <input type="number" id="coord-y" placeholder="Y">
-                        </div>
-                    </div>
-                    <button class="btn-submit" onclick="saveCoordinates()">
-                        <i class="fas fa-save"></i> Guardar en Base de Datos
-                    </button>
-                    <div id="add-alert" class="alert-success hidden">✅ Coordenada guardada con éxito en Google Sheets.</div>
                 </div>
-            </section>
+            </div>
 
-            <!-- VISTA 3: EXTRAER JUGADOR -->
-            <section id="view-extract-player" class="dashboard-view hidden">
-                <h2 class="view-title">Radar de Jugador</h2>
-                <div class="glass-panel">
-                    <div class="input-group search-bar-group">
-                        <input type="text" placeholder="Ingresa el nombre del jugador para extraer..." id="extract-player-input">
-                        <button class="btn-submit" onclick="extractPlayer()"><i class="fas fa-search"></i> Rastrear</button>
-                    </div>
-                    
-                    <div id="player-table-container" class="hidden mt-20">
-                        <div class="visual-player-card mb-20" style="width: fit-content;">
-                            <img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png" alt="avatar" class="visual-avatar">
-                            <div class="visual-info">
-                                <h3 id="extracted-player-name">Bazeslow</h3>
-                                <span class="visual-badge"><i class="fas fa-shield-alt"></i> Revelations</span>
-                            </div>
-                        </div>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Colonia</th>
-                                    <th>X</th>
-                                    <th>Y</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><span class="colony-badge">Main Base</span></td>
-                                    <td>125</td>
-                                    <td>-450</td>
-                                    <td><button class="icon-btn-danger"><i class="fas fa-trash"></i></button></td>
-                                </tr>
-                                <tr>
-                                    <td><span class="colony-badge">1st Colony</span></td>
-                                    <td>12</td>
-                                    <td>89</td>
-                                    <td><button class="icon-btn-danger"><i class="fas fa-trash"></i></button></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+            <!-- 2. KPIs de Google Sheets -->
+            <div class="dashboard-panel kpi-panel">
+                <h2 class="panel-title">Métricas Generales (Google Sheets)</h2>
+                <div id="kpiGrid" class="kpi-grid">
+                    <!-- Las tarjetas KPI se insertarán aquí desde JS -->
+                    <div class="kpi-card"><h3>Total Jugadores</h3><p id="kpiTotalPlayers">Cargando...</p></div>
+                    <div class="kpi-card"><h3>Coordenadas Guardadas</h3><p id="kpiTotalCoords">Cargando...</p></div>
+                    <div class="kpi-card"><h3>Alianzas Registradas</h3><p id="kpiTotalAlliances">Cargando...</p></div>
                 </div>
-            </section>
+            </div>
 
-            <!-- VISTA 4: EXTRAER ALIANZA -->
-            <section id="view-extract-alliance" class="dashboard-view hidden">
-                <h2 class="view-title">Radar de Alianza</h2>
-                <div class="glass-panel">
-                    <div class="input-group search-bar-group">
-                        <input type="text" placeholder="Ingresa el nombre de la alianza..." id="extract-alliance-input">
-                        <button class="btn-submit" onclick="extractAlliance()"><i class="fas fa-users"></i> Escanear</button>
-                    </div>
-                    
-                    <div id="alliance-table-container" class="hidden mt-20">
-                        <button class="btn-submit mb-20" style="width: max-content; background: #27c93f; color: black;"><i class="fas fa-file-export"></i> Exportar a TXT</button>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Jugador</th>
-                                    <th>Main</th>
-                                    <th>1st Col</th>
-                                    <th>2nd Col</th>
-                                    <th>3rd Col</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="highlight-cyan">Bazeslow</td>
-                                    <td>125, -450</td>
-                                    <td>12, 89</td>
-                                    <td>--</td>
-                                    <td>--</td>
-                                </tr>
-                                <tr>
-                                    <td class="highlight-cyan">Comandante</td>
-                                    <td>0, 0</td>
-                                    <td>100, 200</td>
-                                    <td>300, -150</td>
-                                    <td>--</td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <!-- 3. Mapa de la Galaxia Interactiva (Coordenadas) -->
+            <div class="dashboard-panel map-panel">
+                <h2 class="panel-title">Mapa de Coordenadas de la Galaxia</h2>
+                <!-- Wrapper que oculta el desbordamiento -->
+                <div class="map-viewport">
+                    <!-- Div que contiene el fondo y se moverá/zoomeará -->
+                    <div id="galaxyMap" class="galaxy-map">
+                        <!-- Ejes X e Y dibujados vía CSS -->
+                        <div class="axis axis-x"></div>
+                        <div class="axis axis-y"></div>
+                        <!-- Los puntos de las coordenadas se inyectarán aquí -->
                     </div>
                 </div>
-            </section>
-        </main>
+            </div>
+        </section>
+
+        <!-- ================= VISTA 2: PERFIL DE JUGADOR (Desde el buscador) ================= -->
+        <section id="view-player-detail" class="view-section hidden">
+            <button class="back-btn" onclick="navigate('view-home')">← Volver al Dashboard</button>
+            
+            <div id="playerDetailHeader" class="player-detail-header">
+                <!-- Avatar, Nombre, Nivel y Alianza inyectados por JS -->
+            </div>
+            
+            <h3 class="planets-title">Planetas del Jugador</h3>
+            <div id="playerPlanetsGrid" class="planets-grid">
+                <!-- Tarjetas de planetas con el botón [+] inyectadas por JS -->
+            </div>
+        </section>
+
+        <!-- ================= VISTA 3: ALIANZA ================= -->
+        <section id="view-alliance-detail" class="view-section hidden">
+            <button class="back-btn" onclick="navigate('view-home')">← Volver al Dashboard</button>
+            <h2 id="allianceTitle" class="panel-title">Alianza: Cargando...</h2>
+            
+            <div id="allianceList" class="alliance-list">
+                <!-- Lista horizontal: Jugador a la izquierda -> Planetas a la derecha -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODALES (Ventanas Emergentes) ================= -->
+    
+    <!-- Modal: Obtener Coordenadas (Selección de tipo) -->
+    <div id="modalGetCoords" class="modal-overlay hidden">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modalGetCoords')">&times;</span>
+            <h2>Obtener Coordenadas</h2>
+            
+            <div class="form-group">
+                <label for="getCoordsType">Tipo de búsqueda:</label>
+                <select id="getCoordsType">
+                    <option value="alliance">Por Alianza</option>
+                    <option value="player">Por Jugador</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="getCoordsInput">Nombre:</label>
+                <input type="text" id="getCoordsInput" placeholder="Escribe el nombre...">
+            </div>
+            
+            <button id="btnFetchCoords" class="action-btn">Buscar</button>
+        </div>
     </div>
 
-    <!-- SCRIPT DE NAVEGACIÓN SPA Y LÓGICA -->
+    <!-- Modal: Información Rápida del Jugador -->
+    <div id="modalPlayerInfo" class="modal-overlay hidden">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modalPlayerInfo')">&times;</span>
+            <div id="quickPlayerInfoContent">
+                <!-- Se inyecta info del jugador aquí -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Añadir Coordenada (Al presionar [+] en un planeta) -->
+    <div id="modalAddCoord" class="modal-overlay hidden">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('modalAddCoord')">&times;</span>
+            <h2>Añadir Coordenada</h2>
+            <p id="addCoordTargetInfo" class="target-info"></p> <!-- Ej: Jugador: Baze | Planeta: Main -->
+            
+            <div class="coords-inputs">
+                <div class="form-group">
+                    <label>Eje X:</label>
+                    <input type="number" id="coordX" placeholder="Ej: 1500">
+                </div>
+                <div class="form-group">
+                    <label>Eje Y:</label>
+                    <input type="number" id="coordY" placeholder="Ej: -800">
+                </div>
+            </div>
+            <button id="btnSaveCoord" class="action-btn">Guardar en Sheets</button>
+        </div>
+    </div>
+
+    <!-- Scripts separados por responsabilidad -->
+    <script src="js/api.js"></script>
     <script src="js/dashboard.js"></script>
 </body>
-
 </html>

@@ -15,18 +15,11 @@
                 <img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png?size=4096&ignore=true" alt="BuddyBot" class="logo-img">
                 <span class="logo-text">BuddyBot</span>
             </div>
-            <ul class="nav-links">
-                <li><a href="#">Comandos</a></li>
-                <li><a href="#">Módulos <i class="fas fa-chevron-down"></i></a></li>
-                <li><a href="#">Recursos <i class="fas fa-chevron-down"></i></a></li>
-            </ul>
         </div>
         
         <div class="nav-right">
-            <span class="nav-text-muted">BuddyBot lo hace todo</span>
-            <a href="#" class="icon-btn"><i class="fas fa-globe"></i> ES <i class="fas fa-chevron-down"></i></a>
-            <a href="#" class="icon-btn"><i class="fas fa-moon"></i></a>
-            <!-- Nuevo Botón de Login Avanzado -->
+            <span class="nav-text-muted">BuddyBot x Revelations</span>
+            <!-- Botón de Login Avanzado -->
             <a href="login.html" class="btn-login-advanced">
                 <div class="btn-icon-wrapper">
                     <svg class="btn-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" fill="currentColor">
@@ -41,51 +34,70 @@
         </div>
     </nav>
 
-    <!-- Contenedor Principal (Hero) -->
+    <!-- Contenedor Principal (Hero y Animación) -->
     <main class="main-container">
-        <div class="bg-silhouette"></div>
+        <!-- Glow sutil de fondo -->
+        <div class="bg-glow"></div>
 
-        <div class="modules-grid">
-            <a href="#" class="module-card">
-                <div class="module-icon"><i class="fas fa-radar"></i></div>
-                <span class="module-text">Live Scout</span>
-            </a>
-            <a href="#" class="module-card">
-                <div class="module-icon"><i class="fas fa-chart-line"></i></div>
-                <span class="module-text">War Stats</span>
-            </a>
-            <a href="#" class="module-card">
-                <div class="module-icon"><i class="fas fa-trophy"></i></div>
-                <span class="module-text">Top Rankings</span>
-            </a>
-            <a href="#" class="module-card">
-                <div class="module-icon"><i class="fas fa-map-marked-alt"></i></div>
-                <span class="module-text">Coordenadas</span>
-            </a>
-            <a href="#" class="module-card">
-                <div class="module-icon"><i class="fas fa-users"></i></div>
-                <span class="module-text">Alianzas</span>
-            </a>
-            <a href="#" class="module-card">
-                <div class="module-icon"><i class="fas fa-crosshairs"></i></div>
-                <span class="module-text">Matchmaking</span>
-            </a>
-            <a href="#" class="module-card">
-                <div class="module-icon"><i class="fas fa-gavel"></i></div>
-                <span class="module-text">Moderación</span>
-            </a>
-            <a href="#" class="module-card">
-                <div class="module-icon"><i class="fas fa-book"></i></div>
-                <span class="module-text">Registros</span>
-            </a>
-            <a href="#" class="module-card">
-                <div class="module-icon"><i class="fas fa-cog"></i></div>
-                <span class="module-text">Configuración</span>
-            </a>
-            <a href="#" class="module-card">
-                <div class="module-icon"><i class="fas fa-plus"></i></div>
-                <span class="module-text">Y más...</span>
-            </a>
+        <div class="hero-content">
+            
+            <div class="hero-left">
+                <img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png?size=4096&ignore=true" alt="BuddyBot" class="floating-bot-small">
+                
+                <div class="code-terminal">
+                    <div class="terminal-header">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
+                        <span class="terminal-title">buddybot_core.py</span>
+                    </div>
+                    <div class="terminal-body">
+                        <pre><span id="typed-code"></span><span class="cursor"></span></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-right">
+                <div class="modules-grid">
+                    <a href="javascript:void(0)" class="module-card" onclick="showCode('liveScout')">
+                        <div class="module-icon"><i class="fas fa-radar"></i></div>
+                        <span class="module-text">Live Scout</span>
+                    </a>
+                    <a href="javascript:void(0)" class="module-card" onclick="showCode('warStats')">
+                        <div class="module-icon"><i class="fas fa-chart-line"></i></div>
+                        <span class="module-text">War Stats</span>
+                    </a>
+                    <a href="javascript:void(0)" class="module-card" onclick="showCode('topRankings')">
+                        <div class="module-icon"><i class="fas fa-trophy"></i></div>
+                        <span class="module-text">Top Rankings</span>
+                    </a>
+                    <a href="javascript:void(0)" class="module-card" onclick="showCode('coordenadas')">
+                        <div class="module-icon"><i class="fas fa-map-marked-alt"></i></div>
+                        <span class="module-text">Coordenadas</span>
+                    </a>
+                    <a href="javascript:void(0)" class="module-card" onclick="showCode('alianzas')">
+                        <div class="module-icon"><i class="fas fa-users"></i></div>
+                        <span class="module-text">Alianzas</span>
+                    </a>
+                    <a href="javascript:void(0)" class="module-card" onclick="showCode('matchmaking')">
+                        <div class="module-icon"><i class="fas fa-crosshairs"></i></div>
+                        <span class="module-text">Matchmaking</span>
+                    </a>
+                    <a href="javascript:void(0)" class="module-card" onclick="showCode('moderacion')">
+                        <div class="module-icon"><i class="fas fa-gavel"></i></div>
+                        <span class="module-text">Moderación</span>
+                    </a>
+                    <a href="javascript:void(0)" class="module-card" onclick="showCode('registros')">
+                        <div class="module-icon"><i class="fas fa-book"></i></div>
+                        <span class="module-text">Registros</span>
+                    </a>
+                    <a href="javascript:void(0)" class="module-card" onclick="showCode('configuracion')">
+                        <div class="module-icon"><i class="fas fa-cog"></i></div>
+                        <span class="module-text">Configuración</span>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -137,8 +149,6 @@
         </div>
     </section>
 
-    
-
     <!-- Footer Moderno -->
     <footer class="footer">
         <p>© 2026 BuddyBot WEB | Sistema de Inteligencia Táctica</p>
@@ -152,7 +162,10 @@
     <!-- Comando flotante -->
     <div class="floating-command">
         <span class="cmd-icon">/</span>
-        <span class="cmd-text">Buscar jugador</span>
+        <span class="cmd-text">Revelations Alliance</span>
     </div>
+
+    <!-- Script de la aplicación principal -->
+    <script src="js/app.js"></script>
 </body>
 </html>
