@@ -35,15 +35,18 @@ a {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 60px; /* Aumentado */
+
+    height: 64px;
+    padding: 0 35px;
+
     background-color: var(--bg-nav);
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .nav-left, .nav-right {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 14px;
 }
 
 .logo-container {
@@ -77,64 +80,60 @@ a {
 
 /* === BOTÓN DE LOGIN AVANZADO === */
 .btn-login-advanced {
-    position: relative;
     display: flex;
-    height: 52px; /* Aumentado */
     align-items: center;
-    border-radius: 12px;
-    border-top: 1px solid rgba(71, 85, 105, 0.5);
-    border-bottom: 1px solid rgba(71, 85, 105, 0.5);
-    border-left: none;
-    border-right: none;
-    padding: 0 20px; /* Aumentado */
-    background: transparent;
-    outline: none;
-    transition: all 0.2s ease;
+    justify-content: center;
+    gap: 8px;
+    height: 38px;
+    padding: 0 14px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 8px;
+    background: #27272f;
+    color: #e4e4e7;
     cursor: pointer;
     user-select: none;
     text-decoration: none;
-    color: #f8fafc;
+    transition: all 0.2s ease;
 }
 
 .btn-login-advanced:hover {
-    border-top-color: rgba(203, 213, 225, 0.5);
-    border-bottom-color: rgba(203, 213, 225, 0.5);
-    background: rgba(255, 255, 255, 0.05);
+    background: #303039;
+    border-color: rgba(255, 255, 255, 0.18);
+    transform: translateY(-1px);
 }
 
 .btn-login-advanced:active {
-    transform: scale(0.95);
+    transform: scale(0.97);
 }
 
+/* Icono */
 .btn-icon-wrapper {
     display: flex;
-    height: 100%;
     align-items: center;
     justify-content: center;
-    padding-right: 15px; /* Aumentado */
+    padding: 0;
 }
 
 .btn-svg {
-    width: 26px; /* Aumentado */
-    height: 26px;
+    width: 17px;
+    height: 17px;
 }
 
+/* Texto */
 .btn-text-wrapper {
     display: flex;
-    height: 100%;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
 }
 
 .btn-text {
-    margin-top: 2px;
-    text-align: center;
-    font-family: 'Audiowide', cursive;
-    font-size: 1.1rem; /* Aumentado */
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
 }
-
 /* === CONTENEDOR PRINCIPAL === */
 .main-container {
     display: flex;
