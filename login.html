@@ -3,47 +3,109 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Táctico | BuddyBotWEB</title>
-    
+    <title>Login - Revelations x Buddybot</title>
+    <link rel="icon" type="image/png" href="https://cdn.galaxylifegame.net/content/img/alliance_flag/AllianceLogos/flag_4_4_5.png">
+
     <link rel="stylesheet" href="css/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="login-page">
-    <!-- Reutilizamos tu fondo de marca de agua animada -->
-    <div class="bg-silhouette"></div>
+<body>
+    
+    <!-- Fondo de Cuadrícula, Destello y Elementos Flotantes (Lado Derecho) -->
+    <div class="grid-background">
+        <!-- Cuadros de colores integrados en la cuadrícula -->
+        <div class="grid-square sq-1"></div>
+        <div class="grid-square sq-2"></div>
+        <div class="grid-square sq-3"></div>
+        <div class="grid-square sq-4"></div>
+        
+        <div class="glow-orb"></div>
+        
+        <!-- Avatares Flotantes de BuddyBot -->
+        <img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png?size=256" class="floating-bot bot-1" alt="Bot 1">
+        <img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png?size=256" class="floating-bot bot-2" alt="Bot 2">
+        <img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png?size=256" class="floating-bot bot-3" alt="Bot 3">
+    </div>
 
-    <div class="login-container">
-        <div class="login-card glass-panel">
-            <div class="login-header">
-                <!-- Avatar del bot brillante -->
-                <img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png?size=128" alt="BuddyBot Logo" class="login-logo">
-                <h2 class="neon-cyan">ACCESO TÁCTICO</h2>
-                <p class="text-muted">Ingresa tus credenciales de Revelations</p>
+    <!-- Contenedor Lateral del Formulario (Lado Izquierdo, Más ancho) -->
+    <main class="login-sidebar">
+        
+        <div class="login-content">
+            
+            <!-- Botón para regresar al inicio -->
+            <a href="index.html" class="back-link">
+                <i class="fas fa-arrow-left"></i> Volver a la página principal
+            </a>
+
+            <h1 class="login-title">Iniciar Sesión</h1>
+            <p class="login-subtitle">Ingrese sus credenciales para continuar</p>
+
+            <!-- Insignia Mejorada: Revelations x BuddyBot -->
+            <div class="brand-badge">
+                <div class="badge-item">
+                    <img src="https://cdn.galaxylifegame.net/content/img/alliance_flag/AllianceLogos/flag_4_4_5.png" alt="Revelations" class="badge-icon alliance-icon">
+                    <span class="badge-text">Revelations</span>
+                </div>
+                <div class="badge-divider"><i class="fas fa-times"></i></div>
+                <div class="badge-item">
+                    <img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png?size=64" alt="BuddyBot" class="badge-icon bot-icon">
+                    <span class="badge-text" style="color: #00d2ff;">BuddyBot</span>
+                </div>
             </div>
 
             <form id="loginForm" class="login-form">
                 <div class="input-group">
-                    <i class="fas fa-user input-icon"></i>
-                    <input type="text" id="username" placeholder="Usuario" required autocomplete="off">
+                    <input type="text" id="username" placeholder="Nombre de usuario" required autocomplete="off">
                 </div>
                 
                 <div class="input-group">
-                    <i class="fas fa-lock input-icon"></i>
                     <input type="password" id="password" placeholder="Contraseña" required>
                 </div>
 
-                <button type="submit" class="btn-submit">
-                    <i class="fas fa-sign-in-alt"></i> INICIAR SESIÓN
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="keepLogged">
+                        <span class="checkmark"></span>
+                        Mantener mi sesión activa
+                    </label>
+                    <a href="#" class="forgot-link">¿Olvidaste tu contraseña?</a>
+                </div>
+
+                <button type="submit" id="btnSubmit" class="btn-primary">
+                    Iniciar Sesión
                 </button>
+                
+                <p class="register-text">
+                    ¿No tienes una cuenta? <a href="#" class="register-link">Crear cuenta</a>
+                </p>
             </form>
 
-            <div class="login-footer">
-                <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Volver a la página principal</a>
+            <div class="divider">
+                <span>O</span>
+            </div>
+
+            <div class="social-login">
+                <button class="btn-social btn-google">
+                    <i class="fab fa-google"></i> Iniciar sesión con Google
+                </button>
+                <button class="btn-social btn-discord">
+                    <i class="fab fa-discord"></i> Iniciar sesión con Discord
+                </button>
             </div>
         </div>
-    </div>
 
-    <!-- Script de Autenticación -->
+        <footer class="login-footer">
+            <div class="footer-lang">
+                <i class="fas fa-globe"></i>
+            </div>
+            <div class="footer-links">
+                <a href="#">CONDICIONES DE SERVICIO</a>
+                <a href="#">POLÍTICA DE PRIVACIDAD</a>
+            </div>
+        </footer>
+
+    </main>
+    
     <script src="js/auth.js"></script>
 </body>
 </html>
