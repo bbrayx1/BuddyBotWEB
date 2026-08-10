@@ -34,7 +34,7 @@ body {
     height: 100%;
     display: flex;
     flex-direction: column;
-    border-radius: 0; /* Quitamos bordes redondeados porque choca con la pantalla */
+    border-radius: 0; 
     border-top: none;
     border-bottom: none;
     border-left: none;
@@ -98,6 +98,12 @@ body {
     color: #00d5ff;
 }
 
+.sidebar-btn.active {
+    background: rgba(0, 213, 255, 0.1);
+    color: #00d5ff;
+    border-color: #00d5ff;
+}
+
 /* Perfil tipo Discord (Footer del Sidebar) */
 .sidebar-footer {
     background: rgba(0, 0, 0, 0.4);
@@ -109,7 +115,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: relative; /* Para el menú flotante */
+    position: relative; 
 }
 
 .user-profile {
@@ -148,7 +154,7 @@ body {
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    border: 2px solid #12141c; /* Color del fondo para hacer el corte */
+    border: 2px solid #12141c; 
 }
 .status-dot.online { background-color: #23a559; }
 .status-dot.idle { background-color: #f0b232; }
@@ -310,7 +316,7 @@ body {
 }
 
 /* =========================================
-   PANELES, MAPA Y RESTO (Sin cambios bruscos)
+   PANELES, MAPA Y RESTO
    ========================================= */
 .view-section { max-width: 1400px; margin: 0 auto; animation: fadeIn 0.4s ease-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -367,3 +373,177 @@ body {
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: #18191e; }
 ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+
+/* === VISTA: AÑADIR COORDENADAS === */
+.search-box-large {
+    position: relative;
+    width: 100%;
+}
+
+.search-box-large input {
+    width: 100%;
+    padding: 20px 20px 20px 55px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #e4e4e7;
+    font-size: 1.1rem;
+    outline: none;
+    transition: all 0.3s;
+}
+
+.search-box-large input:focus {
+    border-color: #00d5ff;
+    box-shadow: 0 0 15px rgba(0, 213, 255, 0.2);
+}
+
+.search-box-large .search-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #a1a1aa;
+    font-size: 1.3rem;
+}
+
+.spinner {
+    color: #c80ab4;
+    font-size: 0.95rem;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+}
+
+.players-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.player-card-interactive {
+    background: rgba(24, 25, 30, 0.8);
+    border: 1px solid rgba(0, 213, 255, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.player-card-interactive:hover {
+    transform: translateY(-5px);
+    border-color: #00d5ff;
+    box-shadow: 0 10px 25px rgba(0, 213, 255, 0.2);
+}
+
+.planets-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 15px;
+}
+
+.planet-item-card {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: border-color 0.2s;
+}
+
+.planet-item-card:hover {
+    border-color: #c80ab4;
+}
+
+.btn-add-coord-small {
+    background: rgba(200, 10, 180, 0.1);
+    color: #c80ab4;
+    border: 1px solid #c80ab4;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: bold;
+}
+
+.btn-add-coord-small:hover {
+    background: #c80ab4;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(200, 10, 180, 0.4);
+}
+
+/* === BARRA DE HERRAMIENTAS FLOTANTE ====== */
+.dashboard-toolbar {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 20px;
+    background: rgba(255, 255, 255, 0.05); /* Efecto "blanquito" y translúcido */
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.toolbar-link {
+    color: rgba(255, 255, 255, 0.6); /* Color gris/blanco sutil */
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.toolbar-link:hover {
+    color: #ffffff; /* Brilla al pasar el ratón */
+    transform: translateY(-2px);
+}
+
+.toolbar-divider {
+    width: 1px;
+    height: 15px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* === BOTONES PLAYER | ALLIANCE (GET COORDS) === */
+.toggle-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.toggle-btn {
+    flex: 1;
+    padding: 15px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid #a1a1aa;
+    color: #a1a1aa;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: 'Audiowide', cursive;
+    font-size: 1rem;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.toggle-btn.active {
+    background: rgba(0, 213, 255, 0.1);
+    border-color: #00d5ff;
+    color: #00d5ff;
+    box-shadow: 0 0 15px rgba(0, 213, 255, 0.2);
+}
