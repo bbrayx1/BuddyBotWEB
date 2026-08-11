@@ -183,30 +183,42 @@
             ====================================================== -->
             <section id="view-get-coords" class="view-section hidden">
                 <div class="dashboard-panel">
+                    <!-- TÍTULO -->
                     <h2 class="panel-title">
                         <i class="fas fa-crosshairs"></i> Extracción de Coordenadas (Get Coords)
                     </h2>
-                    <p class="text-muted" style="margin-bottom: 20px;">
-                        Selecciona el modo de extracción e ingresa el objetivo a buscar.
-                    </p>
 
-                    <!-- MODO -->
-                    <div class="toggle-buttons mb-20">
-                        <button id="btnTogglePlayer" class="toggle-btn active"><i class="fas fa-user"></i> Player</button>
-                        <button id="btnToggleAlliance" class="toggle-btn"><i class="fas fa-shield-alt"></i> Alliance</button>
+                    <!-- OVERLAY SPOTLIGHT (Oscurece el fondo) -->
+                    <div id="spotlightOverlay" class="spotlight-overlay hidden"></div>
+
+                    <!-- WRAPPER SPOTLIGHT (Contiene todo el bloque de búsqueda) -->
+                    <div id="spotlightWrapper" class="spotlight-wrapper">
+                        
+                        <!-- 1. BARRA DE BÚSQUEDA -->
+                        <div class="search-box-large" style="margin-bottom: 20px;">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="getCoordsInput" placeholder="Nombre exacto del jugador..." autocomplete="off">
+                        </div>
+
+                        <!-- 2. BOTONES DE TIPO DE CONSULTA -->
+                        <div class="toggle-buttons" style="margin-bottom: 20px;">
+                            <button id="btnTogglePlayer" class="toggle-btn active"><i class="fas fa-user"></i> Player</button>
+                            <button id="btnToggleAlliance" class="toggle-btn"><i class="fas fa-shield-alt"></i> Alliance</button>
+                        </div>
+
+                        <!-- 3. FOTO E INSTRUCCIONES (Siempre visible por defecto) -->
+                        <div id="spotlightStatus" class="spotlight-status">
+                            <img id="spotlightStarling" src="https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Fcharacters%2Fstarling_spying.png&w=640&q=75" alt="Starling">
+                            <p id="spotlightText" class="spotlight-text font-nasalization">Escribe para iniciar el escaneo del radar...</p>
+                        </div>
+
+                        <!-- 4. RESULTADOS EN VIVO (Scrolleables, ocultos hasta buscar) -->
+                        <div id="getCoordsResultsGrid" class="spotlight-results-grid hidden"></div>
                     </div>
 
-                    <!-- BUSCADOR -->
-                    <div class="search-box-large">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="getCoordsInput" placeholder="Nombre exacto del jugador..." autocomplete="off">
-                        <button id="btnExecuteGet" class="btn-add-coord-small get-coords-action-btn" style="position: absolute; right: 10px; top: 10px; height: calc(100% - 20px); font-size: 1rem;">
-                            <i class="fas fa-download"></i> Extraer
-                        </button>
-                    </div>
                 </div>
             </section>
-
+                            
             <!-- =====================================================
                  VISTA: PERFIL DE JUGADOR (ELITE REESTRUCTURADO)
             ====================================================== -->

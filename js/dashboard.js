@@ -59,22 +59,33 @@ function setupNavigation() {
 }
 
 // ==========================================
-// LÓGICA VISTA "GET COORDS" (Player | Alliance)
+// LÓGICA VISTA "GET COORDS" (Spotlight + Debounce)
 // ==========================================
+// ==========================================
+// LÓGICA VISTA "GET COORDS" (Spotlight + Debounce)
+// ==========================================
+let getSearchTimeout = null;
+
 function setupGetCoordsToggle() {
     const btnPlayer = document.getElementById("btnTogglePlayer");
     const btnAlliance = document.getElementById("btnToggleAlliance");
     const getInput = document.getElementById("getCoordsInput");
-    const btnExecute = document.getElementById("btnExecuteGet");
 
-    if (!btnPlayer || !btnAlliance || !getInput || !btnExecute) return;
+    const overlay = document.getElementById("spotlightOverlay");
+    const wrapper = document.getElementById("spotlightWrapper");
+    const statusBox = document.getElementById("spotlightStatus");
+    const statusText = document.getElementById("spotlightText");
+    const resultsGrid = document.getElementById("getCoordsResultsGrid");
 
+    if (!btnPlayer || !btnAlliance || !getInput) return;
+
+    // BOTONES MODO PLAYER / ALLIANCE
     btnPlayer.addEventListener("click", () => {
         currentGetType = "player";
         btnPlayer.classList.add("active");
         btnAlliance.classList.remove("active");
         getInput.placeholder = "Nombre exacto del jugador...";
-        getInput.value = "";
+        resetSpotlight(getInput, resultsGrid, statusBox, statusText);
     });
 
     btnAlliance.addEventListener("click", () => {
@@ -82,25 +93,167 @@ function setupGetCoordsToggle() {
         btnAlliance.classList.add("active");
         btnPlayer.classList.remove("active");
         getInput.placeholder = "Nombre exacto de la alianza...";
-        getInput.value = "";
+        resetSpotlight(getInput, resultsGrid, statusBox, statusText);
     });
 
-    btnExecute.addEventListener("click", () => {
-        const query = getInput.value.trim();
-        if (!query) return alert("Por favor ingresa un nombre.");
+    // ACTIVAR SPOTLIGHT AL HACER CLIC EN EL BUSCADOR
+    getInput.addEventListener("focus", () => {
+        overlay.classList.remove("hidden");
+        setTimeout(() => overlay.classList.add("active"), 10);
+        wrapper.classList.add("active");
 
-        if (currentGetType === "player") {
-            loadPlayerView(query);
-        } else {
-            loadAllianceView(query);
+        if (getInput.value.trim() === "") {
+            statusBox.classList.remove("hidden");
+            statusText.innerText = "Escribe para iniciar el escaneo del radar...";
+            resultsGrid.classList.add("hidden");
         }
     });
 
-    getInput.addEventListener("keydown", event => {
-        if (event.key === "Enter") btnExecute.click();
+    // CERRAR SPOTLIGHT AL HACER CLIC FUERA DEL RECUADRO
+    overlay.addEventListener("click", () => {
+        closeSpotlight(overlay, wrapper);
+    });
+
+    // ===================================================
+    // BÚSQUEDA EN VIVO (DEBOUNCE 3S)
+    // ===================================================
+    getInput.addEventListener("input", (e) => {
+        const query = e.target.value.trim();
+        clearTimeout(getSearchTimeout);
+
+        if (query.length < 2) {
+            resultsGrid.classList.add("hidden");
+            resultsGrid.innerHTML = "";
+            statusBox.classList.remove("hidden");
+            statusText.innerText = "Escribe para iniciar el escaneo del radar...";
+            return;
+        }
+
+        // Mostrar Starling pensando...
+        resultsGrid.classList.add("hidden");
+        statusBox.classList.remove("hidden");
+        statusText.innerText = "Calculando coordenadas en la galaxia...";
+
+        getSearchTimeout = setTimeout(() => {
+            fetchGetCoordsLive(query);
+        }, 3000);
     });
 }
 
+function resetSpotlight(input, grid, statusBox, statusText) {
+    input.value = "";
+    grid.innerHTML = "";
+    grid.classList.add("hidden");
+    statusBox.classList.remove("hidden");
+    statusText.innerText = "Escribe para iniciar el escaneo del radar...";
+}
+
+function closeSpotlight(overlay, wrapper) {
+    overlay.classList.remove("active");
+    setTimeout(() => overlay.classList.add("hidden"), 300);
+    wrapper.classList.remove("active");
+}
+
+// BÚSQUEDA A LA API EN VIVO PARA GET COORDS
+async function fetchGetCoordsLive(query) {
+    const statusBox = document.getElementById("spotlightStatus");
+    const statusText = document.getElementById("spotlightText");
+    const resultsGrid = document.getElementById("getCoordsResultsGrid");
+    const overlay = document.getElementById("spotlightOverlay");
+    const wrapper = document.getElementById("spotlightWrapper");
+
+    try {
+        let results = [];
+        
+        // 1. Busca usando api.js
+        if (currentGetType === "player") {
+            if (typeof api !== "undefined" && api.searchPlayers) {
+                results = await api.searchPlayers(query);
+            }
+        } else {
+            if (typeof api !== "undefined" && api.searchAlliances) {
+                results = await api.searchAlliances(query);
+            }
+        }
+
+        if (!results || results.length === 0) {
+            statusBox.classList.remove("hidden");
+            statusText.innerText = "No se encontraron objetivos con ese nombre.";
+            resultsGrid.classList.add("hidden");
+            return;
+        }
+
+        // Ocultar Starling, mostrar resultados
+        statusBox.classList.add("hidden");
+        resultsGrid.innerHTML = "";
+        resultsGrid.classList.remove("hidden");
+
+        // RENDERIZAR JUGADORES
+        if (currentGetType === "player") {
+            results.sort((a, b) => (b.Level || 0) - (a.Level || 0));
+            results.slice(0, 24).forEach(player => {
+                const avatarUrl = player.Avatar || DEFAULT_AVATAR;
+                const allianceText = player.AllianceId ? `<i class="fas fa-shield-alt"></i> ${player.AllianceId}` : "Sin Alianza";
+
+                const card = document.createElement("div");
+                card.className = "player-card-interactive";
+                card.innerHTML = `
+                    <img src="${avatarUrl}" alt="Avatar" style="width:55px; height:55px; border-radius:8px; border:1px solid #00d5ff; object-fit:cover;" onerror="this.src='${DEFAULT_AVATAR}'">
+                    <div>
+                        <h3 style="color:white; font-family:'Audiowide', cursive; font-size:1.1rem; margin-bottom:5px;">${player.Name || "Jugador"}</h3>
+                        <span style="background:rgba(0,213,255,0.1); color:#00d5ff; padding:3px 8px; border-radius:12px; font-size:0.8rem; font-weight:bold; display:inline-flex; align-items:center; gap:5px;">
+                            <img src="${LEVEL_ICON}" style="width:14px;"> Lvl ${player.Level || 0}
+                        </span>
+                        <p style="color:#a1a1aa; font-size:0.8rem; margin-top:6px;">${allianceText}</p>
+                    </div>
+                `;
+                
+                // Acción al dar click
+                card.addEventListener("click", () => {
+                    closeSpotlight(overlay, wrapper);
+                    document.getElementById("getCoordsInput").value = player.Name;
+                    loadPlayerView(player.Name);
+                });
+                resultsGrid.appendChild(card);
+            });
+        } 
+        // RENDERIZAR ALIANZAS
+        else {
+            results.sort((a, b) => (b.AllianceLevel || 0) - (a.AllianceLevel || 0));
+            results.slice(0, 24).forEach(alliance => {
+                let logoUrl = "https://cdn.galaxylifegame.net/content/img/alliance_flag/AllianceLogos/flag_1_1_1.png";
+                if (alliance.Emblem) {
+                    logoUrl = `https://cdn.galaxylifegame.net/content/img/alliance_flag/AllianceLogos/flag_${alliance.Emblem.Shape}_${alliance.Emblem.Pattern}_${alliance.Emblem.Icon}.png`;
+                }
+
+                const card = document.createElement("div");
+                card.className = "player-card-interactive";
+                card.innerHTML = `
+                    <img src="${logoUrl}" alt="Logo" style="width:55px; height:55px; object-fit:contain; filter: drop-shadow(0 0 5px rgba(0, 213, 255, 0.4));">
+                    <div>
+                        <h3 style="color:white; font-family:'Audiowide', cursive; font-size:1.1rem; margin-bottom:5px;">${alliance.Name || "Alianza"}</h3>
+                        <span style="color:#00d5ff; font-size:0.8rem; font-weight:bold;">
+                            Nivel ${alliance.AllianceLevel || 0}
+                        </span>
+                        <p style="color:#a1a1aa; font-size:0.8rem; margin-top:6px;">Miembros: ${alliance.MembersCount || "?"}</p>
+                    </div>
+                `;
+                
+                // Acción al dar click
+                card.addEventListener("click", () => {
+                    closeSpotlight(overlay, wrapper);
+                    document.getElementById("getCoordsInput").value = alliance.Name;
+                    loadAllianceView(alliance.Name);
+                });
+                resultsGrid.appendChild(card);
+            });
+        }
+    } catch (error) {
+        console.error("Error buscando:", error);
+        statusBox.classList.remove("hidden");
+        statusText.innerText = "Error de conexión a la API.";
+    }
+}
 // ==========================================
 // LÓGICA VISTA "ADD COORDS" (DEBOUNCE 3 SEGUNDOS)
 // ==========================================
@@ -368,7 +521,7 @@ async function loadPlayerView(playerName) {
             const colonyColors = ["Planet_blue.png", "Planet_green.png", "Planet_red.png", "Planet_violet.png", "Planet_white.png", "Planet_yellow.png"];
             const sortedPlanets = [...player.Planets].sort((a, b) => (b.HQLevel || 0) - (a.HQLevel || 0));
 
-            sortedPlanets.slice(0, 12).forEach((planet, index) => {
+            sortedPlanets.slice(0, 24).forEach((planet, index) => {
                 const isMain = index === 0;
                 let planetTitle = isMain ? "Main Planet" : (index === 1 ? "1st Colony" : index === 2 ? "2nd Colony" : index === 3 ? "3rd Colony" : `${index}th Colony`);
                 const hqLvl = planet.HQLevel || 1;
