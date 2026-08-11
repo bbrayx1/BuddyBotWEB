@@ -717,7 +717,6 @@ function setupMobileMenu() {
         });
     }
 
-    // Cerrar menú automáticamente al pulsar cualquier botón lateral (y restaurar ícono)
     document.querySelectorAll(".sidebar-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             if (window.innerWidth <= 900 && sidebar) {
