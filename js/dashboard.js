@@ -1,14 +1,10 @@
-// ==========================================
 // CONSTANTES Y RECURSOS OFICIALES
-// ==========================================
-
 const DEFAULT_AVATAR = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Favatars.phoenixnetwork.net%2Fdefault.png&w=128&q=75";
 const LEVEL_ICON = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Ficons%2Ficon_level.png&w=32&q=75";
+const LEVEL_ICON_ALLIANCE = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Ficons%2Ficon_allianceLevel.png&w=32&q=75"
 const STARBASE_ICON = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Ficons%2Fstarbase.png&w=64&q=75";
 
-// ==========================================
 // VARIABLES GLOBALES Y NAVEGACIÓN
-// ==========================================
 const homeMenuBtn = document.getElementById("homeMenuBtn");
 const addCoordsMenuBtn = document.getElementById("addCoordsMenuBtn");
 const getCoordsMenuBtn = document.getElementById("getCoordsMenuBtn");
@@ -16,9 +12,7 @@ const getCoordsMenuBtn = document.getElementById("getCoordsMenuBtn");
 let searchTimeout = null;
 let currentGetType = "player";
 
-// ==========================================
 // INICIALIZACIÓN
-// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     initChart();
     initMap();
@@ -29,6 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupMobileMenu();
 });
 
+// Función central para cambiar de vista (SPA)
 // Función central para cambiar de vista (SPA)
 function navigate(viewId, activeBtnId = null) {
     document.querySelectorAll(".view-section").forEach(section => {
@@ -47,6 +42,32 @@ function navigate(viewId, activeBtnId = null) {
         const activeBtn = document.getElementById(activeBtnId);
         if (activeBtn) activeBtn.classList.add("active");
     }
+
+    // ==========================================
+    // METAMORFOSIS DEL LOGO MÓVIL (APP HEADER)
+    // ==========================================
+    const mobileLogo = document.getElementById("mobileLogo");
+    if (mobileLogo) {
+        // Si entramos a ver los STATS de un jugador o una alianza
+        if (viewId === "view-player-detail" || viewId === "view-alliance-detail") {
+            mobileLogo.classList.add("is-back-btn");
+            mobileLogo.innerHTML = `<i class="fas fa-arrow-left"></i> <span>Volver</span>`;
+            
+            // Su nueva función será regresar al Get Coords
+            mobileLogo.onclick = () => {
+                navigate("view-get-coords", "getCoordsMenuBtn");
+            };
+        } 
+        // Si estamos en cualquier otra pestaña normal (Home, Add, Get)
+        else {
+            mobileLogo.classList.remove("is-back-btn");
+            mobileLogo.innerHTML = `
+                <img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png?size=64" alt="BuddyBot">
+                <span>BuddyBot</span>
+            `;
+            mobileLogo.onclick = null; // Pierde la acción de clic
+        }
+    }
 }
 
 function setupNavigation() {
@@ -56,14 +77,9 @@ function setupNavigation() {
 
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) logoutBtn.addEventListener("click", () => window.location.href = "login.html");
-}
+}   
 
-// ==========================================
 // LÓGICA VISTA "GET COORDS" (Spotlight + Debounce)
-// ==========================================
-// ==========================================
-// LÓGICA VISTA "GET COORDS" (Spotlight + Debounce)
-// ==========================================
 let getSearchTimeout = null;
 
 function setupGetCoordsToggle() {
@@ -115,7 +131,7 @@ function setupGetCoordsToggle() {
     });
 
     // ===================================================
-    // BÚSQUEDA EN VIVO (DEBOUNCE 3S)
+    // BÚSQUEDA EN VIVO (DEBOUNCE 3S + SKELETON LOADING)
     // ===================================================
     getInput.addEventListener("input", (e) => {
         const query = e.target.value.trim();
@@ -129,11 +145,29 @@ function setupGetCoordsToggle() {
             return;
         }
 
-        // Mostrar Starling pensando...
-        resultsGrid.classList.add("hidden");
-        statusBox.classList.remove("hidden");
-        statusText.innerText = "Calculando coordenadas en la galaxia...";
+        // 1. Ocultar Starling
+        statusBox.classList.add("hidden");
+        
+        // 2. Mostrar la grilla
+        resultsGrid.classList.remove("hidden");
 
+        // 3. Inyectar "Skeleton Cards" (Tarjetas fantasma cargando)
+        resultsGrid.innerHTML = Array(8).fill(`
+            <div class="player-card-interactive" style="pointer-events: none; cursor: default;">
+                <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
+                    <div class="skeleton-avatar"></div>
+                    <div style="display: flex; flex-direction: column; justify-content: center; flex: 1; gap: 10px;">
+                        <div class="skeleton-line" style="width: 60%; height: 16px;"></div>
+                        <div style="display: flex; gap: 10px;">
+                            <div class="skeleton-line" style="width: 35%; height: 14px;"></div>
+                            <div class="skeleton-line" style="width: 25%; height: 14px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // 4. Iniciar conteo de 3 segundos para buscar en la API
         getSearchTimeout = setTimeout(() => {
             fetchGetCoordsLive(query);
         }, 3000);
@@ -191,20 +225,36 @@ async function fetchGetCoordsLive(query) {
         // RENDERIZAR JUGADORES
         if (currentGetType === "player") {
             results.sort((a, b) => (b.Level || 0) - (a.Level || 0));
-            results.slice(0, 24).forEach(player => {
-                const avatarUrl = player.Avatar || DEFAULT_AVATAR;
-                const allianceText = player.AllianceId ? `<i class="fas fa-shield-alt"></i> ${player.AllianceId}` : "Sin Alianza";
+            
+            results.forEach(player => {
+                const avatarUrl = player.Avatar ? player.Avatar : DEFAULT_AVATAR;
+                const allianceText = player.AllianceId 
+                    ? `<span style="display: flex; align-items: center; gap: 5px; color:#a1a1aa; font-size:0.85rem; text-transform: capitalize;">
+                        <i class="fas fa-shield-alt"></i> ${player.AllianceId}
+                    </span>` 
+                    : "";
 
                 const card = document.createElement("div");
                 card.className = "player-card-interactive";
+
+                // NUEVO CONTENEDOR: Agrupa avatar y estadísticas
                 card.innerHTML = `
-                    <img src="${avatarUrl}" alt="Avatar" style="width:55px; height:55px; border-radius:8px; border:1px solid #00d5ff; object-fit:cover;" onerror="this.src='${DEFAULT_AVATAR}'">
-                    <div>
-                        <h3 style="color:white; font-family:'Audiowide', cursive; font-size:1.1rem; margin-bottom:5px;">${player.Name || "Jugador"}</h3>
-                        <span style="background:rgba(0,213,255,0.1); color:#00d5ff; padding:3px 8px; border-radius:12px; font-size:0.8rem; font-weight:bold; display:inline-flex; align-items:center; gap:5px;">
-                            <img src="${LEVEL_ICON}" style="width:14px;"> Lvl ${player.Level || 0}
-                        </span>
-                        <p style="color:#a1a1aa; font-size:0.8rem; margin-top:6px;">${allianceText}</p>
+                    <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
+                        <img src="${avatarUrl}" alt="Avatar" style="width:55px; height:55px; border-radius:8px; border:1px solid #d8fdfc; object-fit:cover; flex-shrink: 0;" onerror="this.src='${DEFAULT_AVATAR}'">
+                        <div style="display: flex; flex-direction: column; justify-content: center; flex: 1; min-width: 0;">
+                            <h3 style="color:white; font-family:'Nasalization', sans-serif; font-size:1.1rem; margin:0 0 8px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${player.Name || "Jugador"}</h3>
+                            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                                
+                                <!-- NIVEL ALINEADO, SIN FONDO Y CON FUENTE NASALIZATION -->
+                                <span style="display: flex; align-items: center; gap: 5px; color: #00d5ff; font-size: 0.9rem; font-family: 'Nasalization', sans-serif;">
+                                    <img src="${LEVEL_ICON}" style="width:14px; object-fit: contain;"> ${player.Level || 0}
+                                </span>
+                                
+                                <!-- TEXTO DE ALIANZA (Solo se renderiza si tiene alianza) -->
+                                ${allianceText}
+                                
+                            </div>
+                        </div>
                     </div>
                 `;
                 
@@ -220,7 +270,8 @@ async function fetchGetCoordsLive(query) {
         // RENDERIZAR ALIANZAS
         else {
             results.sort((a, b) => (b.AllianceLevel || 0) - (a.AllianceLevel || 0));
-            results.slice(0, 24).forEach(alliance => {
+            
+            results.forEach(alliance => {
                 let logoUrl = "https://cdn.galaxylifegame.net/content/img/alliance_flag/AllianceLogos/flag_1_1_1.png";
                 if (alliance.Emblem) {
                     logoUrl = `https://cdn.galaxylifegame.net/content/img/alliance_flag/AllianceLogos/flag_${alliance.Emblem.Shape}_${alliance.Emblem.Pattern}_${alliance.Emblem.Icon}.png`;
@@ -228,14 +279,29 @@ async function fetchGetCoordsLive(query) {
 
                 const card = document.createElement("div");
                 card.className = "player-card-interactive";
+                
+                // INYECCIÓN TÁCTICA: Cambiamos el fondo para que use su PROPIO LOGO
+                card.style.setProperty("--bg-watermark", `url('${logoUrl}')`);
+                
                 card.innerHTML = `
-                    <img src="${logoUrl}" alt="Logo" style="width:55px; height:55px; object-fit:contain; filter: drop-shadow(0 0 5px rgba(0, 213, 255, 0.4));">
-                    <div>
-                        <h3 style="color:white; font-family:'Audiowide', cursive; font-size:1.1rem; margin-bottom:5px;">${alliance.Name || "Alianza"}</h3>
-                        <span style="color:#00d5ff; font-size:0.8rem; font-weight:bold;">
-                            Nivel ${alliance.AllianceLevel || 0}
-                        </span>
-                        <p style="color:#a1a1aa; font-size:0.8rem; margin-top:6px;">Miembros: ${alliance.MembersCount || "?"}</p>
+                    <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
+                        <img src="${logoUrl}" alt="Logo" style="width:55px; height:55px; object-fit:contain; filter: drop-shadow(0 0 5px rgba(0, 213, 255, 0.4)); flex-shrink: 0;">
+                        <div style="display: flex; flex-direction: column; justify-content: center; flex: 1; min-width: 0;">
+                            <h3 style="color:white; font-family:'Nasalization', sans-serif; font-size:1.1rem; margin:0 0 8px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${alliance.Name || "Alianza"}</h3>
+                            <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                                
+                                <!-- NIVEL ALINEADO Y SIN FONDO AZUL -->
+                                <span style="display: flex; align-items: center; gap: 5px; color: #ffd900; font-size: 0.85rem; font-weight: bold;">
+                                    <img src="${LEVEL_ICON_ALLIANCE}" style="width:14px; object-fit: contain;"> ${alliance.AllianceLevel || 0}
+                                </span>
+                                
+                                <!-- MIEMBROS ALINEADOS -->
+                                <span style="display: flex; align-items: center; gap: 5px; color:#a1a1aa; font-size:0.85rem;">
+                                    <i class="fas fa-users"></i> ${alliance.Members ? alliance.Members.length : "?"}
+                                </span>
+                                
+                            </div>
+                        </div>
                     </div>
                 `;
                 
@@ -254,6 +320,7 @@ async function fetchGetCoordsLive(query) {
         statusText.innerText = "Error de conexión a la API.";
     }
 }
+
 // ==========================================
 // LÓGICA VISTA "ADD COORDS" (DEBOUNCE 3 SEGUNDOS)
 // ==========================================
@@ -334,6 +401,22 @@ async function fetchPlayersForAdding(query) {
                 document.getElementById("addCoordsPlanetsContainer").classList.remove("hidden");
                 document.getElementById("addCoordsSelectedPlayer").innerHTML = buildPlayerHeaderHtml(player);
                 renderPlanetsGrid(player, "addCoordsPlanetsList");
+
+                // Metamorfosis móvil para Add Coords
+                const mobileLogo = document.getElementById("mobileLogo");
+                if (mobileLogo && window.innerWidth <= 900) {
+                    mobileLogo.classList.add("is-back-btn");
+                    mobileLogo.innerHTML = `<i class="fas fa-arrow-left"></i> <span>Volver</span>`;
+                    mobileLogo.onclick = () => {
+                        document.getElementById("addCoordsPlanetsContainer").classList.add("hidden");
+                        document.getElementById("addCoordsResultsGrid").classList.remove("hidden");
+                        
+                        // Restaurar Logo
+                        mobileLogo.classList.remove("is-back-btn");
+                        mobileLogo.innerHTML = `<img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png?size=64" alt="BuddyBot"> <span>BuddyBot</span>`;
+                        mobileLogo.onclick = null;
+                    };
+                }
             });
             addResultsGrid.appendChild(card);
         });
@@ -529,8 +612,7 @@ async function loadPlayerView(playerName) {
 
                 const card = document.createElement("div");
                 card.className = "elite-planet-square";
-                card.addEventListener("click", () => openModal("modalAddCoord", player.Name, planetTitle, hqLvl));
-
+                
                 card.innerHTML = `
                     <div class="elite-planet-name">${planetTitle}</div>
                     <div class="elite-planet-img-container">
@@ -542,6 +624,31 @@ async function loadPlayerView(playerName) {
                     </div>
                     <div class="elite-coords-placeholder">x; y</div>
                 `;
+
+                // Acción al dar click: COPIAR coordenadas en vez de abrir modal
+                card.addEventListener("click", () => {
+                    // Más adelante, aquí leeremos la coordenada real de Google Sheets
+                    const coordsToCopy = "x; y"; 
+                    
+                    navigator.clipboard.writeText(coordsToCopy).then(() => {
+                        const placeholder = card.querySelector('.elite-coords-placeholder');
+                        
+                        // Efecto visual de "Copiado"
+                        placeholder.innerHTML = `<i class="fas fa-check"></i> ¡Copiado!`;
+                        placeholder.style.color = "#a3e635"; // Verde radioactivo
+                        placeholder.style.opacity = "1";
+                        
+                        // Restaurar el texto después de 2 segundos
+                        setTimeout(() => {
+                            placeholder.innerHTML = "x; y";
+                            placeholder.style.color = "#c6fcf3";
+                            placeholder.style.opacity = "0.7";
+                        }, 2000);
+                    }).catch(err => {
+                        console.error("Error al copiar al portapapeles:", err);
+                    });
+                });
+
                 planetsGrid.appendChild(card);
             });
         }
@@ -592,8 +699,6 @@ async function loadAllianceView(allianceName) {
                         </span>
                     </div>
                 `;
-                // Si deseas que al clickear un miembro abra su perfil, descomenta esta línea:
-                // card.addEventListener("click", () => loadPlayerView(member.Name));
                 
                 list.appendChild(card);
             });
@@ -697,26 +802,28 @@ function initMap() {
 // ==========================================
 function setupMobileMenu() {
     const mobileBtn = document.getElementById("mobileMenuBtn");
-    const mobileIcon = document.getElementById("mobileMenuIcon");
     const sidebar = document.querySelector(".sidebar");
 
-    if (mobileBtn && sidebar && mobileIcon) {
+    if (mobileBtn && sidebar) {
         mobileBtn.addEventListener("click", () => {
             sidebar.classList.toggle("active");
-            
-            // Alternar entre hamburguesa y cruz
-            if (sidebar.classList.contains("active")) {
-                mobileIcon.className = "fas fa-times";
-                mobileBtn.style.color = "#ff4c4c"; // Se pone rojo la X
-                mobileBtn.style.borderColor = "#ff4c4c";
-            } else {
-                mobileIcon.className = "fas fa-bars";
-                mobileBtn.style.color = "#00d5ff"; // Vuelve a cyan
-                mobileBtn.style.borderColor = "#00d5ff";
-            }
+            // Alterna la clase "active" en el botón para animar la X
+            mobileBtn.classList.toggle("active");
         });
     }
 
+    // Cerrar menú automáticamente al pulsar cualquier botón lateral
+    document.querySelectorAll(".sidebar-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            if (window.innerWidth <= 900 && sidebar) {
+                sidebar.classList.remove("active");
+                // Regresa la X a hamburguesa
+                if (mobileBtn) mobileBtn.classList.remove("active");
+            }
+        });
+    });
+}
+    // Cerrar menú automáticamente al pulsar cualquier botón lateral (y restaurar ícono)
     document.querySelectorAll(".sidebar-btn").forEach(btn => {
         btn.addEventListener("click", () => {
             if (window.innerWidth <= 900 && sidebar) {
@@ -729,4 +836,3 @@ function setupMobileMenu() {
             }
         });
     });
-}

@@ -23,11 +23,6 @@ html, body {
     border-radius: 12px;
 }
 
-body {
-    margin: 0;
-    overflow: hidden; /* Evita scroll en todo el body */
-}
-
 .app-layout {
     display: flex;
     height: 100vh;
@@ -203,11 +198,66 @@ body {
 .back-btn:hover { color: #00d5ff; }
 
 .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+/* =========================================================
+   CARTILLAS DE JUGADOR / ALIANZA (INTERACTIVAS)
+========================================================= */
 .player-card-interactive {
-    display: flex; align-items: center; gap: 15px; padding: 20px; background: rgba(24, 25, 30, 0.8);
-    border: 1px solid rgba(0, 213, 255, 0.2); border-radius: 12px; cursor: pointer; transition: all 0.3s;
+    position: relative;
+    overflow: hidden; 
+    display: flex; 
+    align-items: center; 
+    gap: 15px; 
+    padding: 20px; 
+    background: rgba(24, 25, 30, 0.8); 
+    border: 1px solid rgba(0, 213, 255, 0.2); 
+    border-radius: 12px; 
+    cursor: pointer; 
+    transition: all 0.3s ease; 
+    
+    /* Esta variable almacenará el logo o starling de fondo por cada tarjeta */
+    --bg-watermark: url('https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Fcharacters%2Fstarling_happy.png&w=256&q=75');
 }
-.player-card-interactive:hover { transform: translateY(-5px); border-color: #00d5ff; box-shadow: 0 10px 25px rgba(0, 213, 255, 0.2); }
+
+.player-card-interactive > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* MARCA DE AGUA DINÁMICA (Starling o Logo de Alianza) */
+.player-card-interactive::before {
+    content: "";
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background-image: var(--bg-watermark);
+    background-repeat: no-repeat;
+    background-position: right 15px center; 
+    background-size: contain;
+    
+    /* 1. ESTADO POR DEFECTO: Visible, borroso y YA GRANDECITO */
+    opacity: 0.08; 
+    filter: blur(4px); 
+    transform: scale(1.35); /* Empieza grande desde el inicio */
+    
+    /* Transición suave para el enfoque y el pequeño crecimiento */
+    transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease;
+    z-index: 1; 
+}
+
+/* EFECTO HOVER PARA LA TARJETA PRINCIPAL */
+.player-card-interactive:hover { 
+    transform: translateY(-4px); 
+    border-color: #00d5ff; 
+    background: rgba(10, 15, 25, 0.95);
+    box-shadow: 0 10px 25px rgba(0, 213, 255, 0.4), inset 0 0 15px rgba(0, 213, 255, 0.15); 
+}
+
+/* 2. EFECTO HOVER PARA LA IMAGEN (Se aclara y se agranda poquísimo) */
+.player-card-interactive:hover::before {
+    opacity: 0.10; /* Se hace más visible */
+    filter: blur(2px); /* ¡SE ACLARA! Nítido y perfecto */
+    transform: scale(1.4); /* ¡Crece poquísimo! De 1.35 pasa a 1.4 */
+}
 
 .planets-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
 .planet-item-card { display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; transition: border-color 0.2s; }
@@ -440,28 +490,15 @@ body {
 
 
 /* =========================================================
-BOTONES DE MENÚ HAMBURGUESA
+   BARRA SUPERIOR Y MENÚ HAMBURGUESA (MÓVIL)
 ========================================================= */
-.mobile-menu-btn {
-    display: none; /* Oculto en PC */
-    position: fixed;
-    top: 20px;
-    right: 20px; /* Movido estratégicamente a la derecha */
-    z-index: 3500; /* Siempre por encima del menú */
-    background: rgba(10, 15, 25, 0.9);
-    border: 1px solid #00d5ff;
-    color: #00d5ff;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 1.5rem;
-    cursor: pointer;
-    box-shadow: 0 0 15px rgba(0, 213, 255, 0.3);
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
+.mobile-menu-btn,
+.mobile-header-logo {
+    display: none; /* Oculto de forma estricta en PC */
 }
 
 /* =========================================================
-   MEDIA QUERIES (RESPONSIVE CORREGIDO)
+   MEDIA QUERIES (RESPONSIVE FUSIONADO Y CORREGIDO)
 ========================================================= */
 
 /* TABLETS Y PANTALLAS MEDIANAS */
@@ -481,26 +518,213 @@ BOTONES DE MENÚ HAMBURGUESA
     .elite-planets-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-/* MENÚ HAMBURGUESA Y MÓVILES (Menor a 900px) */
+/* MENÚ HAMBURGUESA Y BARRA DE NAVEGACIÓN */
 @media (max-width: 900px) {
-    .mobile-menu-btn { display: block; }
+    /* 1. LA BARRA SUPERIOR DIFUMINADA */
+    .main-content::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 120px;
+        background: linear-gradient(
+            to bottom,
+            rgba(10, 15, 25, 1) 0%,
+            rgba(10, 15, 25, 0.795) 35%,
+            rgba(10, 15, 25, 0.684) 60%,
+            rgba(10, 15, 25, 0.3) 80%,
+            transparent 100%
+        );
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        -webkit-mask-image: linear-gradient(
+            to bottom,
+            black 0%,
+            black 45%,
+            transparent 100%
+        );
+        mask-image: linear-gradient(
+            to bottom,
+            black 0%,
+            black 45%,
+            transparent 100%
+        );
+        z-index: 3400;
+        pointer-events: none;
+    }
 
-    /* El menú lateral entra desde la IZQUIERDA */
+    .sidebar-header {
+        display: none !important; 
+    }
+
     .sidebar {
         position: fixed;
-        left: -320px; /* Oculto a la izquierda por defecto */
-        right: auto;  /* Anulamos cualquier anclaje a la derecha */
+        left: -320px;
+        right: auto;
         top: 0;
         width: 280px;
         height: 100vh;
-        z-index: 3000;
-        transition: left 0.3s ease-in-out; /* La animación ahora empuja desde la izquierda */
-        box-shadow: 10px 0 30px rgba(0,0,0,0.8); /* La sombra se proyecta hacia la derecha */
+        z-index: 3600; /* Siempre por encima de la barra */
+        transition: left 0.3s ease-in-out;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.8);
     }
-    
     .sidebar.active { left: 0; }
+    
+    .sidebar-nav {
+        justify-content: flex-start; /* Los elementos empiezan desde arriba */
+        padding-top: 80px; /* Le damos un buen espacio superior para que respire */
+    }
+    .sidebar-btn {
+        justify-content: flex-start; /* ELEMENTOS A LA IZQUIERDA */
+        font-size: 1.1rem;
+        padding: 16px 25px; /* Sangría elegante desde el borde izquierdo */
+    }
+
+    /* 2. LOGO DE BUDDYBOT (Base) */
+    .mobile-header-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        position: fixed;
+        top: 12px;
+        left: 20px;
+        z-index: 3450;
+        transition: all 0.3s ease; 
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent; /* Evita destello al pulsar */
+    }
+
+    .mobile-header-logo img {
+        width: 36px; height: 36px;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        transition: all 0.3s ease;
+    }
+    .mobile-header-logo span {
+        font-family: 'Audiowide', cursive !important;
+        font-size: 1.15rem;
+        color: #ffffff;
+        transition: all 0.3s ease;
+    }
+
+    /* === ESTADO TRANSFORMADO: CUANDO ES BOTÓN DE RETROCESO === */
+    .mobile-header-logo.is-back-btn {
+        background: rgba(0, 213, 255, 0.1);
+        border: 1px solid rgba(0, 213, 255, 0.3);
+        padding: 6px 14px;
+        border-radius: 8px;
+        backdrop-filter: blur(5px);
+        top: 13px; 
+    }
+    .mobile-header-logo.is-back-btn i {
+        color: #00d5ff;
+        font-size: 1.1rem;
+    }
+    .mobile-header-logo.is-back-btn span {
+        font-family: 'Inter', sans-serif !important; 
+        font-size: 0.95rem;
+        color: #e4e4e7;
+    }
+
+
+
+    /* 3. OCULTAR LOS BOTONES "VOLVER" VIEJOS DE PC EN MÓVIL */
+    .view-section .back-btn {
+        display: none !important; 
+    }
+
+    /* 4. BOTÓN HAMBURGUESA MINIMALISTA (Anclado a la derecha en la barra) */
+    .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 10px;
+        right: 15px;
+        z-index: 3500;
+        background: transparent; 
+        border: None;
+        width: 42px; /* Fijamos un cuadro perfecto */
+        height: 42px;
+        padding: 0;
+        border-radius: 6px;
+        cursor: pointer;
+        box-shadow: none;
+        transition: all 0.3s ease;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Contenedor de las líneas */
+    .hamburger-lines {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        width: 20px;
+        height: 16px;
+    }
+
+    /* Estilo de cada línea (Neón) */
+    .hamburger-lines .line {
+        display: block;
+        height: 2px;
+        background-color: #f9feffa4; 
+        border-radius: 2px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* Animación fluida */
+    }
+
+    /* Diseño asimétrico exacto */
+    .line-top {
+        width: 66.6%;
+        align-self: flex-end; /* Alineada a la derecha */
+        transform-origin: left;
+    }
+    .line-mid {
+        width: 100%;
+    }
+    .line-bot {
+        width: 66.6%;
+        transform-origin: right;
+    }
+
+    /* === ANIMACIÓN A "X" (Cuando el menú se abre) === */
+    .mobile-menu-btn.active .line-top {
+        width: 100%;
+        transform-origin: center;
+        transform: translateY(7px) rotate(45deg); /* Baja y rota */
+    }
+    .mobile-menu-btn.active .line-mid {
+        opacity: 0; /* Desaparece */
+        transform: scaleX(0);
+    }
+    .mobile-menu-btn.active .line-bot {
+        width: 100%;
+        transform-origin: center;
+        transform: translateY(-7px) rotate(-45deg); /* Sube y rota */
+    }
+
+    /* 5. BOTÓN DE RETROCESO FLOTANTE */
+    .back-btn {
+        position: fixed;
+        top: 14px;
+        left: 15px;
+        margin: 0; /* Anulamos el margen que usa en PC */
+        padding: 8px 12px;
+        background: transparent;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        color: #e4e4e7;
+        font-size: 0.85rem;
+        z-index: 3500;
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Separamos el ícono del texto */
+    }
 
     .main-content { width: 100%; }
+    
+    /* Dejamos el margen superior para que nada se superponga a la nueva barra */
     .scrollable-area { padding: 80px 20px 20px 20px; }
 
     .kpi-grid, .players-grid, .planets-list { grid-template-columns: 1fr; }
@@ -510,44 +734,44 @@ BOTONES DE MENÚ HAMBURGUESA
 
 /* MÓVILES VERTICALES (Teléfonos estándar) */
 @media (max-width: 650px) {
-    /* Destruimos el "efecto cajita" para que cubra la pantalla completa en celular */
-    .scrollable-area { padding: 80px 0 20px 0; }
+    .scrollable-area { padding: 80px 15px 20px 15px; }
     
     .dashboard-panel, .epc-card { 
-        border-radius: 0; 
-        border-left: none; 
-        border-right: none; 
-        padding: 25px 15px; 
+        border-radius: 12px;
+        border: 1px solid rgba(0, 213, 255, 0.15);
+        padding: 20px 15px; 
         margin-bottom: 20px;
     }
     
-    /* Apilamos estrictamente: Jugador -> Alianza -> Planetas */
     .epc-player-section { flex-direction: column; text-align: center; gap: 15px; }
     .epc-info-wrapper { align-items: center; }
-    .epc-player-name { height: auto; font-size: 1.8rem; margin-bottom: 10px; }
+    .epc-avatar-img { width: 85px; height: 85px; }
+    .epc-player-name { height: auto; font-size: 1.5rem; margin-bottom: 10px; }
     
     .epc-stats-row, .epc-alliance-stats-row { flex-wrap: wrap; justify-content: center; gap: 15px; }
     .epc-alliance-header-row { justify-content: center; }
     
-    .elite-planet-square { min-height: 160px; }
+    .elite-planet-square { min-height: 140px; padding: 15px 5px; }
     
     .dashboard-toolbar { right: 10px; bottom: 10px; padding: 8px 12px; gap: 10px; }
     .toolbar-link { font-size: 0.75rem; }
+    
+    .spotlight-results-grid { 
+        grid-template-columns: 1fr; 
+        max-height: 65vh;
+    }
 }
 
 /* PANTALLAS MUY PEQUEÑAS */
 @media (max-width: 400px) {
     .elite-planets-grid { gap: 10px; }
-    .epc-stats-grid { padding: 15px 10px; }
     .dashboard-toolbar { display: none; }
 }
 
 /* =========================================================
    EFECTO SPOTLIGHT (GET COORDS)
 ========================================================= */
-/* =========================================================
-   EFECTO PRIMER PLANO (SPOTLIGHT - GET COORDS)
-========================================================= */
+
 .search-focus-overlay {
     position: fixed;
     top: 0; 
@@ -642,10 +866,26 @@ BOTONES DE MENÚ HAMBURGUESA
     border-radius: 4px;
 }
 
-/* Móviles: Asegurar columnas simples y un poco más de altura */
-@media (max-width: 650px) {
-    .spotlight-results-grid { 
-        grid-template-columns: 1fr; 
-        max-height: 65vh;
-    }
+/* =========================================================
+   SKELETON LOADING (CARTILLAS FANTASMA)
+========================================================= */
+.skeleton-avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+    animation: skeleton-pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-line {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    animation: skeleton-pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes skeleton-pulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 0.4; }
 }
