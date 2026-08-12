@@ -622,7 +622,7 @@ async function loadPlayerView(playerName) {
                         <img src="${STARBASE_ICON}" alt="SB">
                         <span>${hqLvl}</span>
                     </div>
-                    <div class="elite-coords-placeholder">x; y</div>
+                    <div class="elite-coords-placeholder">123;123</div>
                 `;
 
                 // Acción al dar click: COPIAR coordenadas en vez de abrir modal
@@ -667,48 +667,293 @@ async function loadPlayerView(playerName) {
 async function loadAllianceView(allianceName) {
     const title = document.getElementById("allianceTitle");
     const list = document.getElementById("allianceList");
+
     if (!title || !list) return;
 
-    title.innerHTML = `<i class="fas fa-shield-alt"></i> Alianza: Cargando...`;
-    list.innerHTML = `<div class="spinner"><i class="fas fa-circle-notch fa-spin"></i> Cargando alianza...</div>`;
+    // ESTADO DE CARGA
+    list.innerHTML = `
+        <div class="spinner">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            Loading alliance information...
+        </div>
+    `;
 
     try {
-        if (typeof api === "undefined" || !api.getAlliance) throw new Error("api.getAlliance no está disponible");
-        
+        // VALIDAR API
+        if (typeof api === "undefined" || !api.getAlliance) {
+            throw new Error("api.getAlliance is not available");
+        }
+
+        // OBTENER ALIANZA
         const alliance = await api.getAlliance(allianceName);
+
         if (!alliance) {
-            title.innerHTML = `<i class="fas fa-shield-alt"></i> Alianza no encontrada`;
-            list.innerHTML = `<p class="text-muted">No se encontró información de esta alianza.</p>`;
+            title.innerHTML = `<i class="fas fa-shield-alt"></i> Alliance not found`;
+            list.innerHTML = `<p class="text-muted">No information found for this alliance.</p>`;
             navigate("view-alliance-detail", "getCoordsMenuBtn");
             return;
         }
 
-        title.innerHTML = `<i class="fas fa-shield-alt"></i> Alianza: ${alliance.Name || allianceName}`;
-        list.innerHTML = "";
-
-        if (alliance.Members && alliance.Members.length > 0) {
-            alliance.Members.forEach(member => {
-                const card = document.createElement("div");
-                card.className = "player-card-interactive";
-                card.innerHTML = `
-                    <img src="${member.Avatar || DEFAULT_AVATAR}" alt="Avatar" style="width:55px; height:55px; border-radius:8px; object-fit:cover;" onerror="this.src='${DEFAULT_AVATAR}'">
-                    <div>
-                        <h3 style="color:white; font-family:'Audiowide', cursive; font-size:1rem; margin-bottom:5px;">${member.Name || "Jugador"}</h3>
-                        <span style="color:#00d5ff; font-size:0.8rem;">
-                            <img src="${LEVEL_ICON}" style="width:14px; vertical-align:middle;"> Nivel ${member.Level || 0}
-                        </span>
-                    </div>
-                `;
-                
-                list.appendChild(card);
-            });
-        } else {
-            list.innerHTML = `<p class="text-muted">No hay miembros disponibles.</p>`;
+        // EXTRAER DATOS BÁSICOS (Mapeado exacto a tu JSON)
+        const allianceNameDisplay = alliance.Name || allianceName || "Alliance";
+        const allianceDescription = alliance.Description || "No description available.";
+        const allianceLevel = alliance.AllianceLevel || 0;
+        const wins = alliance.WarsWon || 0;
+        const losses = alliance.WarsLost || 0;
+        const warPoints = alliance.WarPoints || 0;
+        
+        const members = Array.isArray(alliance.Members) ? alliance.Members : [];
+        const totalMembers = members.length;
+        
+        const DEFAULT_AVATAR = "https://cdn.galaxylifegame.net/assets/landingpage/images/avatar/starling.png";
+        
+        // =========================================================
+        // LOGO DINÁMICO DE LA ALIANZA
+        // =========================================================
+        let allianceLogo = DEFAULT_AVATAR;
+        if (alliance.Emblem) {
+            const { Shape, Pattern, Icon } = alliance.Emblem;
+            allianceLogo = `https://cdn.galaxylifegame.net/content/img/alliance_flag/AllianceLogos/flag_${Shape}_${Pattern}_${Icon}.png`;
         }
 
+        // =========================================================
+        // SIMULACIÓN DE GOOGLE SHEETS
+        // =========================================================
+        // TODO: Cuando conectes Google Sheets, reemplaza esto con:
+        // let coordinateData = await api.getAllianceCoordinates(allianceName);
+        
+        let coordinateData = members.map((m, index) => {
+            return {
+                Name: m.Name,
+                // Simulamos un Main Planet para todos
+                mainPlanet: `X:${100 + index}; Y:${200 + index}`,
+                mainHQ: Math.floor(Math.random() * 9) + 1, // HQ aleatorio del 1 al 9
+                // Simulamos Colonia 1 solo para algunos
+                colony1: index % 2 === 0 ? `X:${300 + index}; Y:${400 + index}` : null,
+                colony1HQ: index % 2 === 0 ? Math.floor(Math.random() * 9) + 1 : null,
+                // Simulamos Colonia 2 solo para unos pocos
+                colony2: index % 4 === 0 ? `X:${500 + index}; Y:${600 + index}` : null,
+                colony2HQ: index % 4 === 0 ? Math.floor(Math.random() * 9) + 1 : null,
+                // Farm
+                totalFarm: Math.floor(Math.random() * 50000000),
+                mainFarm: Math.floor(Math.random() * 10000000)
+            };
+        });
+
+        // =========================================================
+        // CALCULAR ESTADÍSTICAS GLOBALES DE COORDENADAS
+        // =========================================================
+        let totalPlanets = 0;
+        let totalFarm = 0;
+        let mainFarm = 0;
+
+        coordinateData.forEach(player => {
+            if (player.mainPlanet) totalPlanets++;
+            for (let i = 1; i <= 11; i++) {
+                if (player[`colony${i}`]) totalPlanets++;
+            }
+            totalFarm += Number(player.totalFarm || 0);
+            mainFarm += Number(player.mainFarm || 0);
+        });
+
+        // =========================================================
+        // FUNCIÓN PARA RENDERIZAR CELDAS DE PLANETAS
+        // =========================================================
+        const renderPlanetCell = (coords, hqLvl, isMain) => {
+            if (!coords || coords === "") {
+                return `<span class="alliance-empty-coordinate">—</span>`;
+            }
+
+            const hq = parseInt(hqLvl) || 1; 
+            let imgSrc = "";
+
+            if (isMain) {
+                // Main usa el asset exacto del nivel
+                imgSrc = `assets/bases/starbase_${hq}.png`;
+            } else {
+                // Colonias usan rangos
+                if (hq >= 6) {
+                    imgSrc = `assets/bases/starbase_colony_6to9.png`;
+                } else if (hq >= 4) {
+                    imgSrc = `assets/bases/starbase_colony_4to5.png`;
+                } else {
+                    imgSrc = `assets/bases/starbase_colony_1to3.png`;
+                }
+            }
+
+            return `
+                <div class="planet-cell-content">
+                    <span class="planet-coords">${coords}</span>
+                    <div class="planet-visual">
+                        <img src="${imgSrc}" alt="HQ${hq}" onerror="this.src='assets/bases/starbase_1.png'">
+                        <span class="planet-hq">° ${hq}</span>
+                    </div>
+                </div>
+            `;
+        };
+
+        // =========================================================
+        // CONSTRUIR TABLA DE JUGADORES
+        // =========================================================
+        let tableRows = "";
+
+        if (members.length > 0) {
+            members.forEach(member => {
+                const playerData = coordinateData.find(
+                    p => p.Name === member.Name || p.name === member.Name || p.Player === member.Name || p.player === member.Name
+                ) || {};
+
+                const avatar = member.Avatar || DEFAULT_AVATAR;
+                
+                const mainPlanetCoords = playerData.mainPlanet || playerData.Main || playerData.main || null;
+                const mainPlanetHQ = playerData.mainHQ || playerData.MainHQ || 1; 
+
+                tableRows += `
+                    <tr>
+                        <!-- PLAYER -->
+                        <td>
+                            <div class="alliance-player-cell">
+                                <img src="${avatar}" class="alliance-player-avatar" onerror="this.src='${DEFAULT_AVATAR}'">
+                                <span>${member.Name || "Jugador"}</span>
+                            </div>
+                        </td>
+
+                        <!-- MAIN -->
+                        <td class="alliance-coordinate alliance-main-planet">
+                            ${renderPlanetCell(mainPlanetCoords, mainPlanetHQ, true)}
+                        </td>
+                `;
+
+                // COLONIAS 1 - 11
+                for (let i = 1; i <= 11; i++) {
+                    const colonyCoords = playerData[`colony${i}`] || playerData[`Colony${i}`] || null;
+                    const colonyHQ = playerData[`colony${i}HQ`] || playerData[`Colony${i}HQ`] || 1; 
+
+                    tableRows += `
+                        <td class="alliance-coordinate">
+                            ${renderPlanetCell(colonyCoords, colonyHQ, false)}
+                        </td>
+                    `;
+                }
+
+                tableRows += `</tr>`;
+            });
+        } else {
+            tableRows = `
+                <tr>
+                    <td colspan="13" style="text-align:center; padding:30px;">
+                        No hay miembros disponibles.
+                    </td>
+                </tr>
+            `;
+        }
+
+        // =========================================================
+        // RENDER COMPLETO HTML
+        // =========================================================
+        list.innerHTML = `
+            <!-- PERFIL DE ALIANZA -->
+            <div class="alliance-profile">
+                <div class="alliance-header-card">
+                    <!-- LOGO -->
+                    <div class="alliance-logo-wrapper">
+                        <img src="${allianceLogo}" class="alliance-logo" alt="Logo" onerror="this.src='${DEFAULT_AVATAR}'">
+                    </div>
+
+                    <!-- INFORMACIÓN -->
+                    <div class="alliance-info">
+                        <h2 class="alliance-name">${allianceNameDisplay}</h2>
+                        <p class="alliance-description">${allianceDescription}</p>
+
+                        <!-- ESTADÍSTICAS -->
+                        <div class="alliance-stats">
+                            <span class="alliance-stat">
+                                <i class="fas fa-layer-group"></i> Nivel:
+                                <strong class="alliance-stat-value">${allianceLevel}</strong>
+                            </span>
+                            <span class="alliance-stat-divider"></span>
+                            <span class="alliance-stat">
+                                <i class="fas fa-users"></i> Miembros:
+                                <strong class="alliance-stat-value">${totalMembers}</strong>
+                            </span>
+                            <span class="alliance-stat-divider"></span>
+                            <span class="alliance-stat">
+                                <i class="fas fa-trophy"></i> Win:
+                                <strong class="alliance-stat-value">${wins}</strong>
+                            </span>
+                            <span class="alliance-stat-divider"></span>
+                            <span class="alliance-stat">
+                                <i class="fas fa-skull-crossbones"></i> Lost:
+                                <strong class="alliance-stat-value">${losses}</strong>
+                            </span>
+                            <span class="alliance-stat-divider"></span>
+                            <span class="alliance-stat">
+                                <i class="fas fa-star"></i> War Points:
+                                <strong class="alliance-stat-value">${warPoints.toLocaleString()}</strong>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ESTADÍSTICAS GOOGLE SHEETS -->
+                <div class="alliance-db-section">
+                    <h3 class="alliance-section-title">
+                        <i class="fas fa-database"></i> Estadísticas de coordenadas
+                    </h3>
+                    <div class="alliance-db-stats">
+                        <div class="alliance-db-card">
+                            <span class="alliance-db-label">Total planetas encontrados</span>
+                            <strong class="alliance-db-value">${totalPlanets}</strong>
+                        </div>
+                        <div class="alliance-db-card">
+                            <span class="alliance-db-label">Farm total</span>
+                            <strong class="alliance-db-value">${totalFarm.toLocaleString()}</strong>
+                        </div>
+                        <div class="alliance-db-card">
+                            <span class="alliance-db-label">Farm Main</span>
+                            <strong class="alliance-db-value">${mainFarm.toLocaleString()}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLA DE COORDENADAS -->
+                <div class="alliance-coordinates-section">
+                    <h3 class="alliance-section-title">
+                        <i class="fas fa-globe"></i> Coordenadas registradas
+                    </h3>
+                    <div class="alliance-table-wrapper">
+                        <table class="alliance-coordinates-table">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th>Main Planet</th>
+                                    <th>Colony 1</th>
+                                    <th>Colony 2</th>
+                                    <th>Colony 3</th>
+                                    <th>Colony 4</th>
+                                    <th>Colony 5</th>
+                                    <th>Colony 6</th>
+                                    <th>Colony 7</th>
+                                    <th>Colony 8</th>
+                                    <th>Colony 9</th>
+                                    <th>Colony 10</th>
+                                    <th>Colony 11</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+
         navigate("view-alliance-detail", "getCoordsMenuBtn");
+
     } catch (error) {
         console.error("Error cargando alianza:", error);
+        title.innerHTML = `<i class="fas fa-shield-alt"></i> Error`;
         list.innerHTML = `<p style="color:#ff4c4c;">Error al cargar la información de la alianza.</p>`;
         navigate("view-alliance-detail", "getCoordsMenuBtn");
     }

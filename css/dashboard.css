@@ -56,13 +56,13 @@ html, body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 1px solid #00d5ff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .sidebar-title {
     font-family: 'Audiowide', cursive !important;
     font-size: 1.2rem;
-    color: #00d5ff;
+    color: #ffffff;
 }
 
 .sidebar-nav {
@@ -193,9 +193,18 @@ html, body {
 /* =========================================================
    AÑADIR Y OBTENER COORDENADAS
 ========================================================= */
-
-.back-btn { margin-bottom: 25px; background: transparent; border: none; color: #a1a1aa; font-family: 'Audiowide', cursive !important; font-weight: 600; cursor: pointer; }
-.back-btn:hover { color: #00d5ff; }
+.back-btn { 
+    margin-bottom: 25px; 
+    background: transparent; 
+    border: none; 
+    color: #a1a1aa; /* Color base (gris) */
+    font-family: 'Nasalization', sans-serif !important; /* Fuente actual */
+    font-weight: 600; 
+    cursor: pointer; 
+}
+.back-btn:hover { 
+    color: #00d5ff; /* Color al pasar el mouse (celeste neón) */
+}
 
 .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
 
@@ -307,9 +316,8 @@ html, body {
 /* =========================================================
    ESTILOS ELITE REESTRUCTURADOS (CARTILLA RESPONSIVE)
 ========================================================= */
-/* Forzar la fuente en todos los elementos del Perfil Elite */
-.epc-player-name, .epc-stat-label, .epc-stat-value, .epc-alliance-name, 
-.epc-level-badge, .elite-planet-name, .elite-hq-row, .elite-hq-number {
+.epc-player-name, .epc-stat-value, .epc-alliance-name, 
+.epc-level-badge, .elite-planet-name,.elite-hq-number {
     font-family: 'Audiowide', cursive !important;
 }
 
@@ -360,18 +368,23 @@ html, body {
 
 .epc-level-badge {
     position: absolute;
-    bottom: -15px; /* Pasa a ser el pie de página del avatar */
+    bottom: -15px; 
     background: #111;
     border: 1px solid #00d5ff;
     color: #c6f1fa;
     padding: 4px 18px;
-    border-radius: 20px;
+    border-radius: 15px;
     font-size: 1.1rem;
     z-index: 10;
     box-shadow: 0 0 15px rgba(0, 213, 255, 0.3);
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+.epc-level-badge span {
+    font-family: 'Nasalization', sans-serif !important;
+    align-items: center;
 }
 
 .epc-level-icon { width: 18px; height: 18px; object-fit: contain; }
@@ -404,9 +417,19 @@ html, body {
     font-size: 0.95rem;
 }
 
-.epc-stat-label { color: #a1a1aa; }
-.epc-stat-value { color: white; margin-left: 5px; }
-.epc-highlight { color: #a3e635; font-weight: bold; }
+.epc-stat-label {
+    font-family: 'Nasalization', sans-serif !important;
+    color: #a1a1aa; 
+}
+.epc-stat-value { 
+    font-family: 'Nasalization', sans-serif !important;
+    color: white; 
+    margin-left: 5px; 
+}
+
+.epc-highlight { 
+    color: #f9e217; 
+}
 
 
 /* --- 3. DIVISOR CENTRAL (|) --- */
@@ -442,7 +465,7 @@ html, body {
 }
 
 .epc-alliance-icon { font-size: 1.8rem; color: #00d5ff; }
-.epc-alliance-name { color: #00d5ff; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 213, 255, 0.2); word-break: break-word; }
+.epc-alliance-name { color: #ffffffd7; font-size: 1.5rem; text-shadow: 0 0 10px rgba(0, 213, 255, 0.2); word-break: break-word; }
 
 .epc-alliance-stats-row {
     display: flex;
@@ -450,14 +473,32 @@ html, body {
     font-size: 0.95rem;
 }
 
-/* ====================================
-   2. GRILLA DE PLANETAS
-==================================== */
-.elite-planets-grid {
+/* 2. GRILLA DE PLANETAS */
+
+.elite-section-title span { /*Titulo "Planets"*/
+    font-family: 'Nasalization', sans-serif !important;
+    color: #e4e4e7;
+
+}
+.elite-section-title i {
+    color: #ffffff !important;
+    text-shadow: 0 0 10px rgba(0, 213, 255, 0.4);
+}
+
+.elite-planets-grid { /*Division de "Planets" en 4 columnas*/
     width: 100%;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 20px;
+}
+
+.elite-coords-placeholder { /*Coordenadas "x;y"*/
+    font-family: 'Nasalization', sans-serif !important;
+}
+.elite-hq-row span { /*Nivel de Base "Hq"*/
+    font-family: 'Nasalization', sans-serif !important;
+    margin-left: -5px;
+    font-size: 1rem;
 }
 
 .elite-planet-square {
@@ -480,8 +521,25 @@ html, body {
 }
 
 .elite-planet-name { margin-bottom: 15px; color: #e4e4e7; font-size: 0.9rem; text-align: center; }
+
+@keyframes float-and-glow {
+    0%, 100% {
+        transform: translateY(0);
+        filter: drop-shadow(0 0 2px rgba(0, 213, 255, 0.2)); /* Brillo mínimo apagado */
+    }
+    50% {
+        transform: translateY(-5px); /* Sube ligeramente */
+        filter: drop-shadow(0 0 9px rgba(0, 213, 255, 0.5)); /* Brillo sutil encendido */
+    }
+}
+
 .elite-planet-img-container { width: 70px; height: 70px; margin-bottom: 15px; flex-shrink: 0; }
-.elite-planet-img-container img { width: 100%; height: 100%; object-fit: contain; animation: float-planet-subtle 4s ease-in-out infinite; }
+.elite-planet-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    animation: float-and-glow 4s ease-in-out infinite;
+}
 
 .elite-hq-row { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 15px; color: #fff; font-size: 1.2rem; }
 .elite-hq-row img { width: 22px; }
@@ -610,24 +668,22 @@ html, body {
 
     /* === ESTADO TRANSFORMADO: CUANDO ES BOTÓN DE RETROCESO === */
     .mobile-header-logo.is-back-btn {
-        background: rgba(0, 213, 255, 0.1);
-        border: 1px solid rgba(0, 213, 255, 0.3);
-        padding: 6px 14px;
-        border-radius: 8px;
-        backdrop-filter: blur(5px);
+        background: transparent;
+        border: none;
+        padding: 6px 0; /* Padding ajustado a puro texto */
+        border-radius: 0;
+        backdrop-filter: none;
         top: 13px; 
     }
     .mobile-header-logo.is-back-btn i {
-        color: #00d5ff;
+        color: #f9feffa4; /* Mismo color de las líneas del menú hamburguesa */
         font-size: 1.1rem;
     }
     .mobile-header-logo.is-back-btn span {
-        font-family: 'Inter', sans-serif !important; 
-        font-size: 0.95rem;
-        color: #e4e4e7;
+        font-family: 'Nasalization', sans-serif !important; 
+        font-size: 1rem;
+        color: #f9feffa4; /* Mismo color de las líneas del menú hamburguesa */
     }
-
-
 
     /* 3. OCULTAR LOS BOTONES "VOLVER" VIEJOS DE PC EN MÓVIL */
     .view-section .back-btn {
@@ -708,15 +764,16 @@ html, body {
         position: fixed;
         top: 14px;
         left: 15px;
-        margin: 0; /* Anulamos el margen que usa en PC */
+        margin: 0; 
         padding: 8px 12px;
         background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 6px;
-        color: #e4e4e7;
-        font-size: 0.85rem;
+        border: none; /* Eliminado el marco blanco antiguo */
+        border-radius: 0;
+        color: #f9feffa4; /* Mismo color de las líneas del menú hamburguesa */
+        font-family: 'Nasalization', sans-serif !important; /* Fuente solicitada */
+        font-size: 1rem;
         z-index: 3500;
-        backdrop-filter: blur(5px);
+        backdrop-filter: none; /* Eliminado el cristal para ser puro texto */
         display: flex;
         align-items: center;
         gap: 8px; /* Separamos el ícono del texto */
@@ -771,7 +828,6 @@ html, body {
 /* =========================================================
    EFECTO SPOTLIGHT (GET COORDS)
 ========================================================= */
-
 .search-focus-overlay {
     position: fixed;
     top: 0; 
@@ -888,4 +944,331 @@ html, body {
     0% { opacity: 0.4; }
     50% { opacity: 1; }
     100% { opacity: 0.4; }
+}
+
+
+/* =========================================================
+   Get para coordenadas alliance
+========================================================= */
+.alliance-profile {
+    width: 100%;
+    margin-bottom: 30px;
+}
+
+/* Cabecera principal */
+.alliance-header-card {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    padding: 25px 30px;
+    background: rgba(10, 15, 25, 0.8);
+    border: 1px solid rgba(0, 213, 255, 0.2);
+    border-radius: 15px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Logo */
+.alliance-logo-wrapper {
+    width: 90px;
+    height: 90px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.alliance-logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px rgba(0, 213, 255, 0.35));
+}
+
+/* Información */
+.alliance-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.alliance-name {
+    margin: 0 0 8px 0;
+    color: #ffffff;
+    font-family: 'Audiowide', cursive !important;
+    font-size: 1.8rem;
+}
+
+.alliance-description {
+    margin: 0 0 18px 0;
+    color: #a1a1aa;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Estadísticas */
+.alliance-stats {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.alliance-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #e4e4e7;
+    font-size: 0.85rem;
+}
+
+.alliance-stat i {
+    color: #00d5ff;
+}
+
+.alliance-stat-value {
+    color: #ffffff;
+    font-family: 'Audiowide', cursive !important;
+}
+
+.alliance-stat-divider {
+    width: 1px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.15);
+}
+
+
+/* =========================================================
+   ESTADÍSTICAS DE GOOGLE SHEETS
+========================================================= */
+
+.alliance-db-section {
+    margin-top: 20px;
+}
+
+.alliance-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    color: #e4e4e7;
+    font-family: 'Audiowide', cursive !important;
+    font-size: 1rem;
+}
+
+.alliance-section-title i {
+    color: #00d5ff;
+}
+
+.alliance-db-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.alliance-db-card {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 213, 255, 0.15);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.alliance-db-label {
+    display: block;
+    color: #a1a1aa;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+}
+
+.alliance-db-value {
+    display: block;
+    color: #00d5ff;
+    font-family: 'Audiowide', cursive !important;
+    font-size: 1.5rem;
+}
+
+
+/* =========================================================
+   TABLA DE COORDENADAS
+========================================================= */
+/* =========================================================
+   TABLA DE COORDENADAS (DISEÑO GAMING MEJORADO)
+========================================================= */
+
+.alliance-name {
+    margin: 0 0 8px 0;
+    color: #ffffff;
+    font-family: 'Audiowide', cursive !important;
+    font-size: 1.8rem;
+    text-transform: none !important; /* Garantiza que se respeten las mayúsculas/minúsculas originales de la alianza */
+}
+
+.alliance-coordinates-section {
+    margin-top: 25px;
+}
+
+.alliance-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid rgba(0, 213, 255, 0.2);
+    border-radius: 12px;
+    background: rgba(10, 12, 18, 0.85);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(0, 213, 255, 0.05);
+}
+
+.alliance-coordinates-table {
+    width: 100%;
+    min-width: 1100px;
+    border-collapse: collapse;
+}
+
+.alliance-coordinates-table thead {
+    background: rgba(0, 213, 255, 0.1);
+    border-bottom: 2px solid rgba(0, 213, 255, 0.3);
+}
+
+.alliance-coordinates-table th {
+    padding: 16px 12px;
+    color: #00d5ff;
+    font-family: 'Audiowide', cursive !important;
+    font-size: 0.8rem;
+    font-weight: normal;
+    text-align: center;
+    white-space: nowrap;
+    text-shadow: 0 0 8px rgba(0, 213, 255, 0.3);
+}
+
+.alliance-coordinates-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+}
+
+.alliance-coordinates-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.alliance-coordinates-table tbody tr:hover {
+    background: rgba(0, 213, 255, 0.08);
+}
+
+/* Nombre del jugador */
+.alliance-player-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left !important;
+    color: #ffffff !important;
+    font-family: 'Audiowide', cursive !important;
+    font-size: 0.95rem;
+}
+
+.alliance-player-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* --- DISEÑO DE LA CELDA DEL PLANETA (COORDS + BASE + HQ) --- */
+.alliance-player-cell span {
+    font-family: 'Nasalization', sans-serif !important;
+    color: #c6f1fa;
+    font-size: 0.85rem;
+}
+
+.planet-cell-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.planet-coords {
+    color: #c6f1fa;
+    font-family: 'Nasalization', sans-serif !important;
+    font-size: 0.85rem;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.planet-visual {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.planet-visual img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+    transition: transform 0.3s ease;
+}
+
+.alliance-coordinates-table tbody tr:hover .planet-visual img {
+    transform: scale(1.15) translateY(-2px);
+    filter: drop-shadow(0 5px 10px rgba(0, 213, 255, 0.4));
+}
+
+.planet-hq {
+    color: #a3e635; /* Verde neón para destacar el nivel */
+    font-family: 'Nasalization', sans-serif !important;
+    font-size: 0.95rem;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(163, 230, 53, 0.4);
+}
+
+/* Cuando no existe planeta */
+.alliance-empty-coordinate {
+    color: #3f3f46;
+    font-size: 1.2rem;
+}
+
+/* Main destacado */
+.alliance-main-planet .planet-coords {
+    border-color: rgba(0, 213, 255, 0.4);
+    background: rgba(0, 213, 255, 0.1);
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 213, 255, 0.2);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .alliance-header-card {
+        padding: 20px;
+    }
+
+    .alliance-db-stats {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 650px) {
+
+    .alliance-header-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .alliance-stats {
+        justify-content: center;
+    }
+
+    .alliance-name {
+        font-size: 1.4rem;
+    }
+
+    .alliance-stat-divider {
+        display: none;
+    }
+
 }

@@ -134,10 +134,6 @@
                             <h3><i class="fas fa-map-marker-alt"></i> Coordenadas</h3>
                             <p id="kpiTotalCoords">Cargando...</p>
                         </div>
-                        <div class="kpi-card">
-                            <h3><i class="fas fa-shield-alt"></i> Alianzas</h3>
-                            <p id="kpiTotalAlliances">Cargando...</p>
-                        </div>
                     </div>
                 </div>
 
@@ -275,13 +271,13 @@
                             <div class="epc-alliance-header-row">
                                 <img id="epcAllianceLogo" src="" alt="Logo" class="epc-alliance-logo hidden">
                                 <i id="epcAllianceIcon" class="fas fa-shield-alt epc-alliance-icon"></i>
-                                <span id="epcAllianceName" class="epc-alliance-name">Cargando...</span>
+                                <span id="epcAllianceName" class="epc-alliance-name">Loading...</span>
                             </div>
                             
                             <!-- Estadísticas Alianza -->
                             <div class="epc-alliance-stats-row" id="epcAllianceStats">
-                                <span class="epc-stat-label">Miembros: <span id="epcAllianceMembers" class="epc-stat-value">0</span></span>
-                                <span class="epc-stat-label">Nivel: <span id="epcAllianceLvl" class="epc-stat-value">0</span></span>
+                                <span class="epc-stat-label">Members: <span id="epcAllianceMembers" class="epc-stat-value">0</span></span>
+                                <span class="epc-stat-label">Level: <span id="epcAllianceLvl" class="epc-stat-value">0</span></span>
                                 <span class="epc-stat-label">Wars: <span id="epcAllianceWars" class="epc-stat-value">0</span></span>
                             </div>
 
@@ -293,8 +289,8 @@
                     ========================================== -->
                     <div class="elite-planets-section">
                         <div class="elite-section-title" style="margin-top: 40px; margin-bottom: 25px; color: #e4e4e7; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; font-family: 'Audiowide', cursive;">
-                            <i class="fas fa-globe-americas" style="color: #00d5ff;"></i>
-                            <span>Planetas</span>
+                            <i class="fas fa-globe-americas" style="color: #ffffffd8;"></i>
+                            <span>Planets</span>
                         </div>
                         <div id="playerPlanetsGrid" class="elite-planets-grid"></div>
                     </div>
@@ -309,9 +305,7 @@
                 <button class="back-btn" onclick="navigate('view-get-coords', 'getCoordsMenuBtn')">
                     <i class="fas fa-arrow-left"></i> Volver a Get Coords
                 </button>
-                <h2 id="allianceTitle" class="panel-title glass-panel">
-                    <i class="fas fa-shield-alt"></i> Alianza: Cargando...
-                </h2>
+                <h2 id="allianceTitle" class="panel-title glass-panel"></h2>
                 <div id="allianceList" class="alliance-list"></div>
             </section>
 
