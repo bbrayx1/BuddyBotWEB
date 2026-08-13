@@ -3,11 +3,20 @@ const DEFAULT_AVATAR = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2
 const LEVEL_ICON = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Ficons%2Ficon_level.png&w=32&q=75";
 const LEVEL_ICON_ALLIANCE = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Ficons%2Ficon_allianceLevel.png&w=32&q=75"
 const STARBASE_ICON = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Ficons%2Fstarbase.png&w=64&q=75";
+const BUDDYBOT_LOGO = 'https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png?size=64';
 
 // VARIABLES GLOBALES Y NAVEGACIÓN
 const homeMenuBtn = document.getElementById("homeMenuBtn");
 const addCoordsMenuBtn = document.getElementById("addCoordsMenuBtn");
 const getCoordsMenuBtn = document.getElementById("getCoordsMenuBtn");
+const SOLAR_SYSTEMS = [
+    "../assets/systems/Solar_system_02.png", // Verde (Main)
+    "../assets/systems/Solar_system_01.png", // Azul
+    "../assets/systems/Solar_system_05.png", // Amarillo
+    "../assets/systems/Solar_system_00.png", // Rojo
+    "../assets/systems/Solar_system_03.png", // Celeste
+    "../assets/systems/Solar_system_04.png", // Morado
+];
 
 let searchTimeout = null;
 let currentGetType = "player";
@@ -21,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupAddCoordsDebounce();
     setupSaveModal();
     setupMobileMenu();
+    renderAddCoordsLayout(null)
 });
 
 // Función central para cambiar de vista (SPA)
@@ -322,108 +332,208 @@ async function fetchGetCoordsLive(query) {
 }
 
 // ==========================================
-// LÓGICA VISTA "ADD COORDS" (DEBOUNCE 3 SEGUNDOS)
+// LÓGICA VISTA "ADD COORDS" (DEBOUNCE + ENTER)
 // ==========================================
+
 function setupAddCoordsDebounce() {
-    const addSearchInput = document.getElementById("addCoordsSearchInput");
-    const addResultsGrid = document.getElementById("addCoordsResultsGrid");
-    const addSpinner = document.getElementById("addCoordsSpinner");
-    const planetsContainer = document.getElementById("addCoordsPlanetsContainer");
+    const input = document.getElementById("addCoordsSearchInput");
+    const overlay = document.getElementById("addCoordsOverlay");
+    const wrapper = document.getElementById("addCoordsSearchWrapper");
+    const resultsGrid = document.getElementById("addCoordsResultsGrid");
 
-    if (addSearchInput) {
-        addSearchInput.addEventListener("input", event => {
-            const query = event.target.value.trim();
-            clearTimeout(searchTimeout);
+    if (!input) return;
 
-            if (query.length < 2) {
-                addResultsGrid.innerHTML = "";
-                if (addSpinner) addSpinner.classList.add("hidden");
-                return;
-            }
+    // 1. ACTIVAR SPOTLIGHT (Vuela al centro)
+    input.addEventListener("focus", () => {
+        overlay.classList.remove("hidden");
+        setTimeout(() => overlay.classList.add("active"), 10);
+        wrapper.classList.add("active");
+    });
 
-            if (addSpinner) addSpinner.classList.remove("hidden");
-            addResultsGrid.innerHTML = "";
-            planetsContainer.classList.add("hidden");
-            addResultsGrid.classList.remove("hidden");
+    // 2. CERRAR SPOTLIGHT (Clic en fondo)
+    overlay.addEventListener("click", () => {
+        overlay.classList.remove("active");
+        setTimeout(() => overlay.classList.add("hidden"), 300);
+        wrapper.classList.remove("active");
+        resultsGrid.classList.add("hidden");
+        input.blur();
+    });
 
-            searchTimeout = setTimeout(() => {
-                fetchPlayersForAdding(query);
-            }, 3000);
-        });
-    }
+    // 3. ESCRIBIR (Skeletons + Debounce 3s)
+    input.addEventListener("input", event => {
+        const query = event.target.value.trim();
+        clearTimeout(searchTimeout);
 
-    const btnBackToSearch = document.getElementById("btnBackToSearch");
-    if (btnBackToSearch) {
-        btnBackToSearch.addEventListener("click", () => {
-            planetsContainer.classList.add("hidden");
-            addResultsGrid.classList.remove("hidden");
-        });
-    }
-}
-
-async function fetchPlayersForAdding(query) {
-    const addSpinner = document.getElementById("addCoordsSpinner");
-    const addResultsGrid = document.getElementById("addCoordsResultsGrid");
-
-    try {
-        let players = [];
-        if (typeof api !== "undefined" && api.searchPlayers) {
-            players = await api.searchPlayers(query);
+        if (query.length < 2) {
+            resultsGrid.classList.add("hidden");
+            resultsGrid.innerHTML = "";
+            return;
         }
 
-        if (addSpinner) addSpinner.classList.add("hidden");
+        resultsGrid.classList.remove("hidden");
+        resultsGrid.innerHTML = Array(4).fill(`
+            <div class="player-card-interactive" style="pointer-events: none;">
+                <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
+                    <div class="skeleton-avatar"></div>
+                    <div style="display: flex; flex-direction: column; flex: 1; gap: 10px;">
+                        <div class="skeleton-line" style="width: 60%; height: 16px;"></div>
+                        <div class="skeleton-line" style="width: 35%; height: 14px;"></div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        searchTimeout = setTimeout(() => fetchPlayersForAdding(query), 3000);
+    });
+
+    // 4. ENTER (Búsqueda forzada)
+    input.addEventListener("keydown", event => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            const query = event.target.value.trim();
+            if (query.length >= 2) {
+                clearTimeout(searchTimeout);
+                resultsGrid.classList.remove("hidden");
+                fetchPlayersForAdding(query);
+            }
+        }
+    });
+}
+
+// ==========================================
+// RENDERIZAR RESULTADOS DEL SPOTLIGHT
+// ==========================================
+async function fetchPlayersForAdding(query) {
+    const resultsGrid = document.getElementById("addCoordsResultsGrid");
+    const overlay = document.getElementById("addCoordsOverlay");
+    const wrapper = document.getElementById("addCoordsSearchWrapper");
+    const input = document.getElementById("addCoordsSearchInput");
+
+    try {
+        let players = typeof api !== "undefined" && api.searchPlayers ? await api.searchPlayers(query) : [];
 
         if (!players || players.length === 0) {
-            addResultsGrid.innerHTML = `<p class="text-muted" style="grid-column: 1/-1;">No se detectaron objetivos con ese nombre en el radar.</p>`;
+            resultsGrid.innerHTML = `<p class="text-muted" style="grid-column: 1/-1; text-align:center;">No se detectaron objetivos en el radar.</p>`;
             return;
         }
 
         players.sort((a, b) => (b.Level || 0) - (a.Level || 0));
-        addResultsGrid.innerHTML = "";
+        resultsGrid.innerHTML = "";
 
         players.forEach(player => {
             const avatarUrl = player.Avatar || DEFAULT_AVATAR;
-            const allianceText = player.AllianceId ? `<i class="fas fa-shield-alt"></i> ${player.AllianceId}` : "Sin Alianza";
             const card = document.createElement("div");
             card.className = "player-card-interactive";
             card.innerHTML = `
-                <img src="${avatarUrl}" alt="Avatar" style="width:55px; height:55px; border-radius:8px; border:1px solid #00d5ff; object-fit:cover;" onerror="this.src='${DEFAULT_AVATAR}'">
-                <div>
-                    <h3 style="color:white; font-family:'Audiowide', cursive; font-size:1.1rem; margin-bottom:5px;">${player.Name || "Jugador"}</h3>
-                    <span style="background:rgba(0,213,255,0.1); color:#00d5ff; padding:3px 8px; border-radius:12px; font-size:0.8rem; font-weight:bold; display:inline-flex; align-items:center; gap:5px;">
-                        <img src="${LEVEL_ICON}" style="width:14px;"> Lvl ${player.Level || 0}
-                    </span>
-                    <p style="color:#a1a1aa; font-size:0.8rem; margin-top:6px;">${allianceText}</p>
+                <div style="display: flex; align-items: center; gap: 15px; width: 100%;">
+                    <img src="${avatarUrl}" alt="Avatar" style="width:55px; height:55px; border-radius:8px; border:1px solid #00d5ff; object-fit:cover;" onerror="this.src='${DEFAULT_AVATAR}'">
+                    <div style="display: flex; flex-direction: column; flex: 1;">
+                        <h3 style="color:white; font-family:'Nasalization', sans-serif; font-size:1.1rem; margin:0 0 8px 0;">${player.Name || "Jugador"}</h3>
+                        <span style="color: #00d5ff; font-size: 0.9rem; font-family: 'Nasalization', sans-serif;">
+                            <img src="${LEVEL_ICON}" style="width:14px; object-fit: contain;"> Lvl ${player.Level || 0}
+                        </span>
+                    </div>
                 </div>
             `;
+            
+            // ACCIÓN: Seleccionar Jugador
             card.addEventListener("click", () => {
-                document.getElementById("addCoordsResultsGrid").classList.add("hidden");
-                document.getElementById("addCoordsPlanetsContainer").classList.remove("hidden");
-                document.getElementById("addCoordsSelectedPlayer").innerHTML = buildPlayerHeaderHtml(player);
-                renderPlanetsGrid(player, "addCoordsPlanetsList");
+                // Cerrar buscador
+                overlay.classList.remove("active");
+                setTimeout(() => overlay.classList.add("hidden"), 300);
+                wrapper.classList.remove("active");
+                resultsGrid.classList.add("hidden");
+                input.value = "";
+                input.blur();
 
-                // Metamorfosis móvil para Add Coords
-                const mobileLogo = document.getElementById("mobileLogo");
-                if (mobileLogo && window.innerWidth <= 900) {
-                    mobileLogo.classList.add("is-back-btn");
-                    mobileLogo.innerHTML = `<i class="fas fa-arrow-left"></i> <span>Volver</span>`;
-                    mobileLogo.onclick = () => {
-                        document.getElementById("addCoordsPlanetsContainer").classList.add("hidden");
-                        document.getElementById("addCoordsResultsGrid").classList.remove("hidden");
-                        
-                        // Restaurar Logo
-                        mobileLogo.classList.remove("is-back-btn");
-                        mobileLogo.innerHTML = `<img src="https://cdn.discordapp.com/avatars/1297733983169417216/742eb2a97534c732c9efd5e9019e9aae.png?size=64" alt="BuddyBot"> <span>BuddyBot</span>`;
-                        mobileLogo.onclick = null;
-                    };
-                }
+                // Renderizar la interfaz central con datos reales
+                renderAddCoordsLayout(player);
             });
-            addResultsGrid.appendChild(card);
+            resultsGrid.appendChild(card);
         });
     } catch (error) {
-        console.error("Error buscando jugador:", error);
-        if (addSpinner) addSpinner.classList.add("hidden");
-        addResultsGrid.innerHTML = `<p style="color:#ff5f56; grid-column:1/-1;">Error de conexión a la API.</p>`;
+        console.error("Error buscando:", error);
+        resultsGrid.innerHTML = `<p style="color:#ff5f56; text-align:center;">Error de conexión a la API.</p>`;
+    }
+}
+
+// ==========================================
+// RENDERIZAR INTERFAZ (VACÍA O CON JUGADOR)
+// ==========================================
+function renderAddCoordsLayout(player = null) {
+    const container = document.getElementById("addCoordsContentLayout");
+    if (!container) return;
+    
+    // Datos Dinámicos o por Defecto
+    const isPopulated = player !== null;
+    const avatarUrl = isPopulated && player.Avatar ? player.Avatar : BUDDYBOT_LOGO;
+    const playerName = isPopulated ? player.Name : "Selecciona un objetivo...";
+    const playerLevel = isPopulated ? player.Level : "Null";
+    const planetsData = isPopulated && player.Planets ? [...player.Planets].sort((a, b) => (b.HQLevel || 0) - (a.HQLevel || 0)) : [];
+
+    container.innerHTML = `
+        <h2 class="add-coords-player-name">${playerName}</h2>
+        <div class="add-coords-split-layout">
+            
+            <!-- IZQUIERDA: AVATAR Y NIVEL -->
+            <div class="add-coords-left-col">
+                <div class="ac-avatar-glow-box">
+                    <img src="${avatarUrl}" class="ac-avatar-img" onerror="this.src='${DEFAULT_AVATAR}'">
+                </div>
+                <div class="ac-level-badge">
+                    <img src="${LEVEL_ICON}" alt="Lvl">${playerLevel}
+                </div>
+            </div>
+
+            <!-- DERECHA: PLANETAS (SISTEMAS SOLARES) -->
+            <div class="add-coords-right-col" id="acPlanetsGrid"></div>
+            
+        </div>
+    `;
+
+    const grid = document.getElementById("acPlanetsGrid");
+
+    // Renderizar 12 tarjetas siempre (llenas o vacías)
+    for (let i = 0; i < 12; i++) {
+        const isMain = i === 0;
+        const planetTitle = isMain ? "Main Planet" : `Colony ${i}`;
+        
+        // Asignar imagen del sistema solar
+        let solarImg = SOLAR_SYSTEMS[0]; // Verde por defecto para Main
+        if (!isMain) solarImg = SOLAR_SYSTEMS[1 + (i % 5)]; // Rotar colores para colonias
+        
+        // Datos si el jugador existe y tiene ese planeta
+        const planetInfo = planetsData[i];
+        let hqLvlHtml = "";
+        let actionClass = "empty-card";
+        let onClickStr = "";
+
+        if (isPopulated && planetInfo) {
+            const hq = planetInfo.HQLevel || 1;
+            let baseImg = isMain ? `assets/bases/starbase_${Math.max(4, Math.min(9, hq))}.png` : 
+                          (hq > 5 ? "assets/bases/starbase_colony_6to9.png" : 
+                          (hq > 3 ? "assets/bases/starbase_colony_4to5.png" : "assets/bases/starbase_colony_1to3.png"));
+            
+            hqLvlHtml = `
+                <div class="ac-base-middle">
+                    <img src="${baseImg}" onerror="this.src='assets/bases/starbase_1.png'">
+                    <span>° ${hq}</span>
+                </div>
+            `;
+            actionClass = "clickable-card";
+            onClickStr = `onclick="openModal('modalAddCoord', '${playerName}', '${planetTitle}', ${hq})"`;
+        }
+
+        grid.innerHTML += `
+            <div class="ac-planet-h-card ${actionClass} ${isMain ? "main-planet-card" : ""}" ${onClickStr}>
+                <span class="ac-planet-title">${planetTitle}</span>
+                
+                <!-- Base en el medio (solo si hay datos) -->
+                ${hqLvlHtml}
+
+                <img src="${solarImg}" class="ac-solar-system-img">
+            </div>
+        `;
     }
 }
 
