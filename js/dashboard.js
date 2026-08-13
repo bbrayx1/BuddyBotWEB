@@ -660,7 +660,6 @@ async function loadPlayerView(playerName) {
         epcName.innerText = "Error Crítico";
     }
 }
-
 // ==========================================
 // CARGAR ALIANZA (VISTA SEPARADA)
 // ==========================================
@@ -671,78 +670,78 @@ async function loadAllianceView(allianceName) {
     if (!title || !list) return;
 
     // ESTADO DE CARGA
+    title.innerHTML = `<i class="fas fa-shield-alt"></i> Alianza: Loading...`;
     list.innerHTML = `
         <div class="spinner">
             <i class="fas fa-circle-notch fa-spin"></i>
-            Loading alliance information...
+            Cargando información de la alianza...
         </div>
     `;
 
     try {
-        // VALIDAR API
         if (typeof api === "undefined" || !api.getAlliance) {
-            throw new Error("api.getAlliance is not available");
+            throw new Error("api.getAlliance no está disponible");
         }
 
-        // OBTENER ALIANZA
         const alliance = await api.getAlliance(allianceName);
 
         if (!alliance) {
-            title.innerHTML = `<i class="fas fa-shield-alt"></i> Alliance not found`;
-            list.innerHTML = `<p class="text-muted">No information found for this alliance.</p>`;
+            title.innerHTML = `<i class="fas fa-shield-alt"></i> Alianza no encontrada`;
+            list.innerHTML = `<p class="text-muted">No se encontró información de esta alianza.</p>`;
             navigate("view-alliance-detail", "getCoordsMenuBtn");
             return;
         }
 
-        // EXTRAER DATOS BÁSICOS (Mapeado exacto a tu JSON)
-        const allianceNameDisplay = alliance.Name || allianceName || "Alliance";
-        const allianceDescription = alliance.Description || "No description available.";
+        // =========================================================
+        // EXTRAER DATOS BÁSICOS
+        // =========================================================
+        const allianceNameDisplay = alliance.Name || allianceName || "Alianza";
+        const allianceDescription = alliance.Description || "Sin descripción disponible.";
         const allianceLevel = alliance.AllianceLevel || 0;
         const wins = alliance.WarsWon || 0;
         const losses = alliance.WarsLost || 0;
         const warPoints = alliance.WarPoints || 0;
         
-        const members = Array.isArray(alliance.Members) ? alliance.Members : [];
+        let members = Array.isArray(alliance.Members) ? alliance.Members : [];
         const totalMembers = members.length;
+
+        // ORDENAR MIEMBROS POR NIVEL (Mayor a menor)
+        members.sort((a, b) => (b.Level || 0) - (a.Level || 0));
         
         const DEFAULT_AVATAR = "https://cdn.galaxylifegame.net/assets/landingpage/images/avatar/starling.png";
         
-        // =========================================================
-        // LOGO DINÁMICO DE LA ALIANZA
-        // =========================================================
+        // ÍCONOS OFICIALES DE ESTADÍSTICAS
+        const ICON_WP = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Ficons%2Fstats%2Ficon_warpoints.png&w=128&q=75";
+        const ICON_MEMBERS = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Ficons%2Fstats%2Ficon_members.png&w=128&q=75";
+        const ICON_LEVEL = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Ficons%2Fstats%2Ficon_allianceLevel.png&w=128&q=75";
+        const ICON_WARS = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Ficons%2Fstats%2Ficon_winrate.png&w=128&q=75";
+
+        // LOGO DINÁMICO
         let allianceLogo = DEFAULT_AVATAR;
         if (alliance.Emblem) {
             const { Shape, Pattern, Icon } = alliance.Emblem;
             allianceLogo = `https://cdn.galaxylifegame.net/content/img/alliance_flag/AllianceLogos/flag_${Shape}_${Pattern}_${Icon}.png`;
         }
 
+        title.innerHTML = `<i class="fas fa-shield-alt"></i> ${allianceNameDisplay}`;
+
         // =========================================================
-        // SIMULACIÓN DE GOOGLE SHEETS
+        // SIMULACIÓN DE GOOGLE SHEETS (Coordenadas formato x;y)
         // =========================================================
-        // TODO: Cuando conectes Google Sheets, reemplaza esto con:
-        // let coordinateData = await api.getAllianceCoordinates(allianceName);
-        
         let coordinateData = members.map((m, index) => {
             return {
                 Name: m.Name,
-                // Simulamos un Main Planet para todos
-                mainPlanet: `X:${100 + index}; Y:${200 + index}`,
-                mainHQ: Math.floor(Math.random() * 9) + 1, // HQ aleatorio del 1 al 9
-                // Simulamos Colonia 1 solo para algunos
-                colony1: index % 2 === 0 ? `X:${300 + index}; Y:${400 + index}` : null,
+                mainPlanet: `${100 + index};${200 + index}`, // Formato limpio
+                mainHQ: Math.floor(Math.random() * 9) + 1,
+                colony1: index % 2 === 0 ? `${300 + index};${400 + index}` : null,
                 colony1HQ: index % 2 === 0 ? Math.floor(Math.random() * 9) + 1 : null,
-                // Simulamos Colonia 2 solo para unos pocos
-                colony2: index % 4 === 0 ? `X:${500 + index}; Y:${600 + index}` : null,
+                colony2: index % 4 === 0 ? `${500 + index};${600 + index}` : null,
                 colony2HQ: index % 4 === 0 ? Math.floor(Math.random() * 9) + 1 : null,
-                // Farm
                 totalFarm: Math.floor(Math.random() * 50000000),
                 mainFarm: Math.floor(Math.random() * 10000000)
             };
         });
 
-        // =========================================================
-        // CALCULAR ESTADÍSTICAS GLOBALES DE COORDENADAS
-        // =========================================================
         let totalPlanets = 0;
         let totalFarm = 0;
         let mainFarm = 0;
@@ -768,28 +767,32 @@ async function loadAllianceView(allianceName) {
             let imgSrc = "";
 
             if (isMain) {
-                // Main usa el asset exacto del nivel
                 imgSrc = `assets/bases/starbase_${hq}.png`;
             } else {
-                // Colonias usan rangos
-                if (hq >= 6) {
-                    imgSrc = `assets/bases/starbase_colony_6to9.png`;
-                } else if (hq >= 4) {
-                    imgSrc = `assets/bases/starbase_colony_4to5.png`;
-                } else {
-                    imgSrc = `assets/bases/starbase_colony_1to3.png`;
-                }
+                if (hq >= 6) imgSrc = `assets/bases/starbase_colony_6to9.png`;
+                else if (hq >= 4) imgSrc = `assets/bases/starbase_colony_4to5.png`;
+                else imgSrc = `assets/bases/starbase_colony_1to3.png`;
             }
 
+            // Imagen/HQ arriba, coords formato texto limpio abajo
             return `
                 <div class="planet-cell-content">
-                    <span class="planet-coords">${coords}</span>
                     <div class="planet-visual">
                         <img src="${imgSrc}" alt="HQ${hq}" onerror="this.src='assets/bases/starbase_1.png'">
-                        <span class="planet-hq">° ${hq}</span>
+                        <span class="planet-hq">${hq}</span>
                     </div>
+                    <span class="planet-coords">${coords}</span>
                 </div>
             `;
+        };
+
+        // =========================================================
+        // FUNCIÓN PARA EL ROL DEL JUGADOR
+        // =========================================================
+        const getRoleName = (roleId) => {
+            if (roleId === 0) return "General";
+            if (roleId === 1) return "Captain";
+            return "Member";
         };
 
         // =========================================================
@@ -804,17 +807,35 @@ async function loadAllianceView(allianceName) {
                 ) || {};
 
                 const avatar = member.Avatar || DEFAULT_AVATAR;
+                const playerLevel = member.Level || 0;
+                
+                // Obtener el rol del JSON
+                const roleId = member.AllianceRole !== undefined ? member.AllianceRole : 2;
+                const roleName = getRoleName(roleId);
                 
                 const mainPlanetCoords = playerData.mainPlanet || playerData.Main || playerData.main || null;
                 const mainPlanetHQ = playerData.mainHQ || playerData.MainHQ || 1; 
 
                 tableRows += `
                     <tr>
-                        <!-- PLAYER -->
+                        <!-- PLAYER COLUMN (Avatar con Nivel + Nombre + Rol) -->
                         <td>
                             <div class="alliance-player-cell">
-                                <img src="${avatar}" class="alliance-player-avatar" onerror="this.src='${DEFAULT_AVATAR}'">
-                                <span>${member.Name || "Jugador"}</span>
+                                <!-- Contenedor Relativo para Avatar y Nivel -->
+                                <div class="alliance-avatar-wrapper">
+                                    <img src="${avatar}" class="alliance-player-avatar" onerror="this.src='${DEFAULT_AVATAR}'">
+                                    <span class="player-level-badge">
+                                        <img src="${LEVEL_ICON}" style="width:8px; object-fit:contain;"> ${playerLevel}
+                                    </span>
+                                </div>
+
+                                <!-- Detalles: Nombre y Rol -->
+                                <div class="alliance-player-details">
+                                    <span class="player-name">${member.Name || "Jugador"}</span>
+                                    <div class="player-badges">
+                                        <span class="player-role role-${roleId}">${roleName}</span>
+                                    </div>
+                                </div>
                             </div>
                         </td>
 
@@ -852,45 +873,47 @@ async function loadAllianceView(allianceName) {
         // RENDER COMPLETO HTML
         // =========================================================
         list.innerHTML = `
-            <!-- PERFIL DE ALIANZA -->
             <div class="alliance-profile">
+                <!-- CABECERA (DISEÑO MEJORADO Y AGRUPADO) -->
                 <div class="alliance-header-card">
-                    <!-- LOGO -->
+                    
                     <div class="alliance-logo-wrapper">
                         <img src="${allianceLogo}" class="alliance-logo" alt="Logo" onerror="this.src='${DEFAULT_AVATAR}'">
                     </div>
 
-                    <!-- INFORMACIÓN -->
-                    <div class="alliance-info">
+                    <div class="alliance-info-center">
                         <h2 class="alliance-name">${allianceNameDisplay}</h2>
                         <p class="alliance-description">${allianceDescription}</p>
+                    </div>
 
-                        <!-- ESTADÍSTICAS -->
-                        <div class="alliance-stats">
-                            <span class="alliance-stat">
-                                <i class="fas fa-layer-group"></i> Nivel:
-                                <strong class="alliance-stat-value">${allianceLevel}</strong>
-                            </span>
-                            <span class="alliance-stat-divider"></span>
-                            <span class="alliance-stat">
-                                <i class="fas fa-users"></i> Miembros:
-                                <strong class="alliance-stat-value">${totalMembers}</strong>
-                            </span>
-                            <span class="alliance-stat-divider"></span>
-                            <span class="alliance-stat">
-                                <i class="fas fa-trophy"></i> Win:
-                                <strong class="alliance-stat-value">${wins}</strong>
-                            </span>
-                            <span class="alliance-stat-divider"></span>
-                            <span class="alliance-stat">
-                                <i class="fas fa-skull-crossbones"></i> Lost:
-                                <strong class="alliance-stat-value">${losses}</strong>
-                            </span>
-                            <span class="alliance-stat-divider"></span>
-                            <span class="alliance-stat">
-                                <i class="fas fa-star"></i> War Points:
-                                <strong class="alliance-stat-value">${warPoints.toLocaleString()}</strong>
-                            </span>
+                    <div class="alliance-stats-right">
+                        <div class="alliance-stat-box">
+                            <img src="${ICON_LEVEL}" alt="Level">
+                            <div class="stat-content">
+                                <span class="stat-label">Nivel</span>
+                                <strong class="stat-value">${allianceLevel}</strong>
+                            </div>
+                        </div>
+                        <div class="alliance-stat-box">
+                            <img src="${ICON_MEMBERS}" alt="Members">
+                            <div class="stat-content">
+                                <span class="stat-label">Miembros</span>
+                                <strong class="stat-value">${totalMembers}</strong>
+                            </div>
+                        </div>
+                        <div class="alliance-stat-box">
+                            <img src="${ICON_WARS}" alt="WinRate">
+                            <div class="stat-content">
+                                <span class="stat-label">Win / Lost</span>
+                                <strong class="stat-value">${wins} / ${losses}</strong>
+                            </div>
+                        </div>
+                        <div class="alliance-stat-box">
+                            <img src="${ICON_WP}" alt="War Points">
+                            <div class="stat-content">
+                                <span class="stat-label">War Points</span>
+                                <strong class="stat-value">${warPoints.toLocaleString()}</strong>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -902,7 +925,7 @@ async function loadAllianceView(allianceName) {
                     </h3>
                     <div class="alliance-db-stats">
                         <div class="alliance-db-card">
-                            <span class="alliance-db-label">Total planetas encontrados</span>
+                            <span class="alliance-db-label">Total planetas</span>
                             <strong class="alliance-db-value">${totalPlanets}</strong>
                         </div>
                         <div class="alliance-db-card">
@@ -925,7 +948,7 @@ async function loadAllianceView(allianceName) {
                         <table class="alliance-coordinates-table">
                             <thead>
                                 <tr>
-                                    <th>Player</th>
+                                    <th>Player Info</th>
                                     <th>Main Planet</th>
                                     <th>Colony 1</th>
                                     <th>Colony 2</th>
