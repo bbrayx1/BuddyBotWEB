@@ -153,29 +153,34 @@
             <!-- =====================================================
                  VISTA 2: AÑADIR COORDENADAS
             ====================================================== -->
-            <section id="view-add-coords" class="view-section hidden" style="position: relative; min-height: 80vh;">
+            <section id="view-add-coords" class="view-section hidden">
                 
-                <!-- CAPA OSCURA LOCAL (Efecto Blur) -->
-                <div id="addCoordsOverlay" class="section-focus-overlay hidden"></div>
-
-                <!-- 1. BUSCADOR ANIMADO (Sube al centro al hacer clic) -->
-                <div id="addCoordsSearchWrapper" class="add-coords-search-wrapper">
-                    <h2 class="panel-title" style="font-family: 'Audiowide', cursive; font-size: 1.5rem; margin-bottom: 15px;">
-                        Radar de Objetivos
-                    </h2>
-                    <div class="search-box-large">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" id="addCoordsSearchInput" placeholder="baze..." autocomplete="off">
-                    </div>
+                <!-- CONTENEDOR PRINCIPAL CON CONTORNO (Igual a Get Coords) -->
+                <div class="dashboard-panel" style="position: relative; overflow: hidden; min-height: 75vh;">
                     
-                    <!-- Grilla Resultados Superpuesta -->
-                    <div id="addCoordsResultsGrid" class="spotlight-results-grid hidden" style="margin-top: 20px;"></div>
-                </div>
+                    <!-- CAPA OSCURA LOCAL (Efecto Blur) -->
+                    <div id="addCoordsOverlay" class="section-focus-overlay hidden"></div>
 
-                <!-- 2. INTERFAZ DEL JUGADOR (Avatar + Planetas) -->
-                <div id="addCoordsContentLayout" class="add-coords-master-layout">
-                </div>
+                    <!-- 1. BUSCADOR ANIMADO (Sube al centro al hacer clic) -->
+                    <div id="addCoordsSearchWrapper" class="add-coords-search-wrapper">
+                        <h2 class="panel-title"">
+                            <i class="fas fa-save"></i> Save Coordinates
+                        </h2>
+                        <div class="search-box-large">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" id="addCoordsSearchInput" placeholder="baze..." autocomplete="off">
+                        </div>
+                        
+                        <!-- Grilla Resultados Superpuesta -->
+                        <div id="addCoordsResultsGrid" class="spotlight-results-grid hidden" style="margin-top: 20px;"></div>
+                    </div>
 
+                    <!-- 2. INTERFAZ DEL JUGADOR (Avatar + Planetas) -->
+                    <div id="addCoordsContentLayout" class="add-coords-master-layout">
+                        <!-- JS inyectará el layout aquí -->
+                    </div>
+
+                </div>
             </section>
 
             <!-- =====================================================
@@ -309,34 +314,41 @@
 </div>
 
 <!-- =============================================================
-     MODAL: AÑADIR COORDENADA
+     MODAL: AÑADIR COORDENADA (DISEÑO HORIZONTAL EXPANDIDO)
 ============================================================= -->
 <div id="modalAddCoord" class="modal-overlay hidden">
-    <div class="modal-content glass-panel">
+    <div class="modal-content glass-panel" style="max-width: 500px;">
         <span class="close-modal" onclick="closeModal('modalAddCoord')"><i class="fas fa-times"></i></span>
-        <h2 style="color: #a1f9fb; font-family: 'Audiowide', cursive; margin-bottom: 10px;">
-            <i class="fas fa-map-marker-alt"></i> Añadir Coordenada
+        
+        <h2 style="color: #00d5ff; font-family: 'Audiowide', cursive; margin-bottom: 5px; text-align: center; text-shadow: 0 0 10px rgba(0, 213, 255, 0.3);">
+            <i class="fas fa-satellite-dish"></i> Save Coordinates
         </h2>
-        <p id="addCoordTargetInfo" class="target-info text-muted" style="margin-bottom: 20px;"></p>
-        <div class="coords-inputs">
-            <div class="form-group">
-                <label>Eje X:</label>
-                <input type="number" id="coordX" placeholder="Ej: 1500">
+        
+        <p id="addCoordTargetInfo" class="target-info" style="text-align: center; margin-bottom: 25px; font-family: 'Nasalization', sans-serif; color: #e4e4e7; font-size: 1.1rem;"></p>
+        
+        <div class="coords-horizontal-row">
+            
+            <div class="form-group-inline expanded-input">
+                <label>x:</label>
+                <input type="number" id="coordX" placeholder="0">
             </div>
-            <div class="form-group">
-                <label>Eje Y:</label>
-                <input type="number" id="coordY" placeholder="Ej: -800">
+            
+            <div class="form-group-inline expanded-input">
+                <label>y:</label>
+                <input type="number" id="coordY" placeholder="0">
             </div>
+
+            <button id="btnSaveCoord" class="action-btn save-coord-btn-icon-only" title="Guardar">
+                <i class="fas fa-save"></i>
+            </button>
+            
         </div>
-        <button id="btnSaveCoord" class="action-btn save-coord-btn">
-            <i class="fas fa-save"></i> Guardar en Base de Datos
-        </button>
     </div>
 </div>
 
 <!-- JAVASCRIPT -->
 <script src="js/api.js"></script>
-<script src="js/dashboard.js"></script>
+<script type="module" src="js/dashboard.js"></script>
 
 </body>
 </html>

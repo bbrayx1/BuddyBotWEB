@@ -135,26 +135,51 @@ html, body {
 
 /* Perfil Inferior (Usuario Logueado) */
 .sidebar-footer {
-    padding: 15px; background: rgba(0, 0, 0, 0.4); border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 20px 15px; background: rgba(0, 0, 0, 0.5); border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 .user-panel { display: flex; align-items: center; justify-content: space-between; position: relative; }
-.user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 5px; border-radius: 6px; transition: background 0.2s; flex: 1; }
-.user-profile:hover { background: rgba(255, 255, 255, 0.05); }
-.avatar-container { position: relative; width: 35px; height: 35px; }
-.user-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
-.status-dot { position: absolute; bottom: -2px; right: -2px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #12141c; }
-.status-dot.online { background-color: #23a559; }
-.status-dot.idle { background-color: #f0b232; }
-.status-dot.dnd { background-color: #f23f43; }
+.user-profile { 
+    display: flex; align-items: center; gap: 14px; cursor: pointer; 
+    padding: 8px 10px; border-radius: 12px; transition: all 0.3s ease; flex: 1; 
+    border: 1px solid transparent;
+}
+.user-profile:hover { 
+    background: rgba(0, 213, 255, 0.05); 
+    border: 1px solid rgba(0, 213, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+.avatar-container { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
+.user-avatar { 
+    width: 100%; height: 100%; border-radius: 50%; object-fit: cover; 
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+}
+.user-profile:hover .user-avatar {
+    border-color: #00d5ff;
+    box-shadow: 0 0 15px rgba(0, 213, 255, 0.3);
+}
+.status-dot { 
+    position: absolute; bottom: 0; right: 0; width: 14px; height: 14px; 
+    border-radius: 50%; border: 3px solid #0f121a; 
+}
+.status-dot.online { background-color: #23a559; box-shadow: 0 0 8px #23a559; }
+.status-dot.idle { background-color: #f0b232; box-shadow: 0 0 8px #f0b232; }
+.status-dot.dnd { background-color: #f23f43; box-shadow: 0 0 8px #f23f43; }
 .status-dot.offline { background-color: #80848e; }
-.user-details { display: flex; flex-direction: column; }
-.user-name { color: #fff; font-size: 0.9rem; font-weight: 600; }
-.user-status { color: #a1a1aa; font-size: 0.75rem; }
+.user-details { display: flex; flex-direction: column; justify-content: center; }
+.user-name { color: #fff; font-size: 0.95rem; font-weight: 600; letter-spacing: 0.3px; }
+.user-status { color: #00d5ff; font-size: 0.75rem; opacity: 0.8; font-weight: 500; }
 .btn-logout-icon {
-    padding: 8px; background: transparent; border: none; border-radius: 6px;
+    padding: 10px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); 
+    border-radius: 8px; margin-left: 10px;
     color: #a1a1aa; font-size: 1.1rem; cursor: pointer; transition: all 0.2s;
 }
-.btn-logout-icon:hover { color: #ff4c4c; background: rgba(255, 76, 76, 0.1); }
+.btn-logout-icon:hover { 
+    color: #ff4c4c; background: rgba(255, 76, 76, 0.1); 
+    border-color: rgba(255, 76, 76, 0.3);
+    transform: translateY(-2px);
+}
 
 
 /* =========================================================
@@ -171,7 +196,8 @@ html, body {
     gap: 10px; color: #e4e4e7; font-size: 1.3rem; 
     font-family: 'Nasalization', sans-serif !important;
     margin-bottom: 25px; }
-.panel-title i { color: #00d5ff; }
+.panel-title i { 
+    color: #00d5ff; }
 
 /* Gráfico de Barras */
 .chart-wrapper { position: relative; height: 300px; width: 100%; margin-bottom: 20px; }
@@ -245,12 +271,12 @@ html, body {
 /* =========================================================
    6. BUSCADOR SPOTLIGHT Y TARJETAS DE RESULTADO
 ========================================================= */
-.search-focus-overlay {
+.spotlight-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%;
-    background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     z-index: 2400; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
 }
-.search-focus-overlay.active { opacity: 1; pointer-events: all; }
+.spotlight-overlay.active { opacity: 1; pointer-events: all; }
 .spotlight-wrapper { position: relative; z-index: 1; transition: transform 0.3s ease; width: 100%; }
 .spotlight-wrapper.active { z-index: 2600; transform: translateY(-2px); }
 
@@ -617,7 +643,7 @@ html, body {
 .section-focus-overlay {
     position: absolute; 
     top: -40px; left: -40px; right: -40px; bottom: -40px; 
-    background: rgba(10, 15, 25, 0.92);
+    background: rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     z-index: 40;
@@ -659,7 +685,7 @@ html, body {
 .add-coords-player-name {
     text-align: center;
     font-family: 'Audiowide', cursive !important;
-    font-size: 2rem;
+    font-size: 1.5rem;
     color: #ffffff;
     text-shadow: 0 0 10px rgba(0, 213, 255, 0.4);
     margin-top: 0;
@@ -681,49 +707,51 @@ html, body {
 
 /* COLUMNA IZQUIERDA: AVATAR CAJA NEÓN */
 .add-coords-left-col {
+    position: relative; /* Clave para que el nivel flote sobre la imagen */
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 15px;
-    background: rgba(10, 15, 25, 0.4);
-    padding: 30px 20px;
-    border-radius: 10px;
-    border: 1px solid rgba(0, 213, 255, 0.15);
-    width: 200px;
+    width: 140px; /* Adaptado al tamaño de la imagen */
     flex-shrink: 0;
+    margin-top: 10px; /* Ligera alineación con la cuadrícula derecha */
 }
 
-.ac-avatar-glow-box {
-    padding: 3px;
-    border-radius: 10px;
-    background: linear-gradient(180deg, #00d5ff, transparent); /* Efecto de luz descendente */
-    box-shadow: 0 0 20px rgba(0, 213, 255, 0.5);
-}
 
 .ac-avatar-img {
-    width: 120px;
-    height: 120px;
-    border-radius: 8px;
+    width: 140px;
+    height: 140px;
+    border-radius: 8px; /* Esquinas ligeramente redondeadas como la referencia */
     object-fit: cover;
     display: block;
-    background: #000;
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.6); /* Sombra suave de la imagen */
 }
 
 .ac-level-badge {
+    position: absolute;
+    bottom: -15px; /* Lo empuja hacia abajo, superponiendo el borde inferior */
+    left: 50%;
+    transform: translateX(-50%); /* Lo centra perfectamente */
+    
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(0, 0, 0, 0.6);
-    border: 1px solid #00d5ff;
+    background: #050a10; /* Fondo azul/negro súper oscuro */
+    border: 1px solid #00d5ff; /* Borde de luz celeste */
     color: #00d5ff;
     font-family: 'Nasalization', sans-serif !important;
     font-size: 1.1rem;
-    padding: 6px 15px;
-    border-radius: 6px;
-    box-shadow: inset 0 0 10px rgba(0, 213, 255, 0.2);
+    padding: 4px 16px;
+    border-radius: 8px; /* Pastilla rectangular con bordes curvos */
+    
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8), inset 0 0 8px rgba(0, 213, 255, 0.2);
+    white-space: nowrap;
+    z-index: 5;
 }
-.ac-level-badge img { width: 14px; }
+
+.ac-level-badge img { 
+    width: 16px; 
+    filter: drop-shadow(0 0 5px rgba(0, 213, 255, 0.6)); /* El icono de estrella brilla */
+}
 
 /* COLUMNA DERECHA: GRILLA HORIZONTAL DE PLANETAS */
 .add-coords-right-col {
@@ -758,13 +786,42 @@ html, body {
     box-shadow: 0 5px 15px rgba(0, 213, 255, 0.15);
 }
 
-.ac-planet-title {
-    font-family: 'Audiowide', cursive !important;
-    color: #ffffff;
-    font-size: 0.9rem;
+.ac-planet-text-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px; 
     z-index: 2;
 }
-.main-planet-card .ac-planet-title { color: #00d5ff; }
+
+.ac-planet-title {
+    font-family: 'Audiowide', cursive !important;
+    color: #e4e4e7;
+    font-size: 0.95rem;
+}
+
+.main-planet-card .ac-planet-title { 
+    color: #b2e5ef;
+}
+
+.ac-base-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.ac-base-info img { 
+    width: 20px; 
+    height: 20px; 
+    object-fit: contain; 
+}
+
+.ac-base-info span { 
+    color: #9ca3af; /* Color medio plomo */
+    font-family: 'Nasalization', sans-serif !important; 
+    font-size: 0.85rem; 
+    font-weight: bold; 
+}
+
 
 /* Centro: Base e Icono de HQ */
 .ac-base-middle {
@@ -780,18 +837,25 @@ html, body {
 .ac-base-middle img { width: 20px; height: 20px; object-fit: contain; }
 .ac-base-middle span { color: #a3e635; font-family: 'Nasalization', sans-serif !important; font-size: 0.9rem; font-weight: bold; }
 
-/* Derecha: Imagen del Sistema Solar recortada */
 .ac-solar-system-img {
     position: absolute;
-    right: -25px; /* Corta la imagen para que asome por la derecha */
+    right: -15px; 
     top: 50%;
-    transform: translateY(-50%);
     width: 90px;
     height: 90px;
     object-fit: contain;
     z-index: 1;
     pointer-events: none;
-    mix-blend-mode: screen; /* Hace que los brillos se fundan con el fondo oscuro */
+    mix-blend-mode: screen; 
+    filter: blur(1px);
+    
+    /* Aplicamos la animación de giro infinito y lento */
+    animation: spin-galaxy 30s linear infinite; 
+}
+
+@keyframes spin-galaxy {
+    0% { transform: translateY(-50%) rotate(0deg); }
+    100% { transform: translateY(-50%) rotate(360deg); }
 }
 
 /* =========================================================
@@ -802,9 +866,136 @@ html, body {
 }
 
 @media (max-width: 768px) {
-    .add-coords-split-layout { flex-direction: column; align-items: center; }
-    .add-coords-left-col { width: 100%; max-width: 350px; flex-direction: row; justify-content: space-around; padding: 20px; }
-    .ac-avatar-img { width: 80px; height: 80px; }
-    .add-coords-right-col { width: 100%; grid-template-columns: 1fr; }
-    .add-coords-search-wrapper.active { top: 5vh; width: 95%; padding: 20px; }
+    .add-coords-split-layout { 
+        flex-direction: column; 
+        align-items: center; 
+    }
+    
+    .add-coords-player-name {
+        margin-bottom: 1px;
+        letter-spacing: 1.5px;
+    }
+
+    /* Contenedor adaptado para abrazar la imagen y centrar el nivel */
+    .add-coords-left-col { 
+        width: auto; 
+        flex-direction: column; 
+        justify-content: center;
+        padding: 10px; 
+        margin-bottom: 15px; /* Espacio antes de los planetas */
+    }
+    
+    /* Imagen más grande (antes estaba en 80px) */
+    .ac-avatar-img { 
+        width: 115px; 
+        height: 115px; 
+    }
+
+    /* Ajuste fino del nivel para encajar con el nuevo tamaño */
+    .ac-level-badge {
+        bottom: -1px;
+        font-size: 1rem;
+        padding: 4px 14px;
+    }
+    
+    .add-coords-right-col { 
+        width: 100%; 
+        grid-template-columns: 1fr; 
+    }
+    
+    .add-coords-search-wrapper.active { 
+        top: 5vh; 
+        width: 95%; 
+        padding: 20px; 
+    }
+}
+
+#spotlightProfileContainer {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+#spotlightProfileContainer::-webkit-scrollbar { width: 6px; }
+#spotlightProfileContainer::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 4px; }
+#spotlightProfileContainer::-webkit-scrollbar-thumb { background: #00d5ff; border-radius: 4px; }
+
+
+/* =========================================================
+   MODAL AÑADIR COORDENADAS (LAYOUT HORIZONTAL EXPANDIDO)
+========================================================= */
+.coords-horizontal-row {
+    display: flex;
+    align-items: flex-end; /* Alinea los inputs y el botón por su base */
+    justify-content: space-between;
+    gap: 15px;
+    width: 100%;
+}
+
+/* Flex 1 hace que el input sea "largo" y ocupe todo el espacio sobrante */
+.form-group-inline.expanded-input {
+    display: flex;
+    flex-direction: column;
+    flex: 1; 
+}
+
+.form-group-inline.expanded-input label {
+    color: #00d5ff;
+    font-family: 'Nasalization', sans-serif !important;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    text-transform: lowercase;
+}
+
+.form-group-inline.expanded-input input {
+    width: 100%;
+    height: 48px; /* Altura fija para alinear con el botón */
+    padding: 0 15px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 213, 255, 0.3);
+    border-radius: 8px;
+    color: #ffffff;
+    font-family: 'Nasalization', sans-serif !important;
+    font-size: 1.2rem;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
+
+.form-group-inline.expanded-input input:focus {
+    background: rgba(0, 213, 255, 0.05);
+    border-color: #00d5ff;
+    box-shadow: 0 0 15px rgba(0, 213, 255, 0.3);
+}
+
+/* Botón Cuadrado (Solo Icono) */
+.save-coord-btn-icon-only {
+    width: 48px; /* Ancho fijo para ser un cuadrado perfecto */
+    height: 48px; /* Misma altura que los inputs */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(90deg, rgba(0,213,255,0.1) 0%, rgba(0,213,255,0.2) 100%);
+    border: 1px solid #00d5ff;
+    border-radius: 8px;
+    color: #00d5ff;
+    font-size: 1.4rem; /* Icono más grande */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0; /* Evita que el botón se aplaste */
+}
+
+.save-coord-btn-icon-only:hover {
+    background: linear-gradient(90deg, rgba(0,213,255,0.3) 0%, rgba(0,213,255,0.4) 100%);
+    color: #ffffff;
+    box-shadow: 0 0 20px rgba(0, 213, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Responsive para celulares pequeños */
+@media (max-width: 400px) {
+    .coords-horizontal-row {
+        gap: 10px;
+    }
 }

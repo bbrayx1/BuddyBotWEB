@@ -1,3 +1,4 @@
+import { CoordinatesController } from "./controllers/CoordinatesController.js";
 // CONSTANTES Y RECURSOS OFICIALES
 const DEFAULT_AVATAR = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Favatars.phoenixnetwork.net%2Fdefault.png&w=128&q=75";
 const LEVEL_ICON = "https://galaxylifegame.net/_next/image?url=https%3A%2F%2Fcdn.galaxylifegame.net%2Fassets%2Flandingpage%2Fimages%2Ficons%2Ficon_level.png&w=32&q=75";
@@ -10,12 +11,12 @@ const homeMenuBtn = document.getElementById("homeMenuBtn");
 const addCoordsMenuBtn = document.getElementById("addCoordsMenuBtn");
 const getCoordsMenuBtn = document.getElementById("getCoordsMenuBtn");
 const SOLAR_SYSTEMS = [
-    "../assets/systems/Solar_system_02.png", // Verde (Main)
-    "../assets/systems/Solar_system_01.png", // Azul
-    "../assets/systems/Solar_system_05.png", // Amarillo
-    "../assets/systems/Solar_system_00.png", // Rojo
-    "../assets/systems/Solar_system_03.png", // Celeste
-    "../assets/systems/Solar_system_04.png", // Morado
+    "assets/systems/Solar_system_02.png", // Verde (Main)
+    "assets/systems/Solar_system_01.png", // Azul
+    "assets/systems/Solar_system_05.png", // Amarillo
+    "assets/systems/Solar_system_00.png", // Rojo
+    "assets/systems/Solar_system_03.png", // Celeste
+    "assets/systems/Solar_system_04.png", // Morado
 ];
 
 let searchTimeout = null;
@@ -466,7 +467,7 @@ function renderAddCoordsLayout(player = null) {
     
     // Datos Dinámicos o por Defecto
     const isPopulated = player !== null;
-    const avatarUrl = isPopulated && player.Avatar ? player.Avatar : BUDDYBOT_LOGO;
+    const avatarUrl = isPopulated && player.Avatar ? player.Avatar : BUDDYBOT_LOGO; // Ajustado a DEFAULT_AVATAR
     const playerName = isPopulated ? player.Name : "Selecciona un objetivo...";
     const playerLevel = isPopulated ? player.Level : "Null";
     const planetsData = isPopulated && player.Planets ? [...player.Planets].sort((a, b) => (b.HQLevel || 0) - (a.HQLevel || 0)) : [];
@@ -475,13 +476,11 @@ function renderAddCoordsLayout(player = null) {
         <h2 class="add-coords-player-name">${playerName}</h2>
         <div class="add-coords-split-layout">
             
-            <!-- IZQUIERDA: AVATAR Y NIVEL -->
+            <!-- IZQUIERDA: AVATAR Y NIVEL ESTILO WIKI -->
             <div class="add-coords-left-col">
-                <div class="ac-avatar-glow-box">
-                    <img src="${avatarUrl}" class="ac-avatar-img" onerror="this.src='${DEFAULT_AVATAR}'">
-                </div>
+                <img src="${avatarUrl}" class="ac-avatar-img" onerror="this.src='${DEFAULT_AVATAR}'">
                 <div class="ac-level-badge">
-                    <img src="${LEVEL_ICON}" alt="Lvl">${playerLevel}
+                    <img src="${LEVEL_ICON}" alt="Lvl"> ${playerLevel}
                 </div>
             </div>
 
@@ -515,9 +514,9 @@ function renderAddCoordsLayout(player = null) {
                           (hq > 3 ? "assets/bases/starbase_colony_4to5.png" : "assets/bases/starbase_colony_1to3.png"));
             
             hqLvlHtml = `
-                <div class="ac-base-middle">
+                <div class="ac-base-info">
                     <img src="${baseImg}" onerror="this.src='assets/bases/starbase_1.png'">
-                    <span>° ${hq}</span>
+                    <span>${hq}</span>
                 </div>
             `;
             actionClass = "clickable-card";
@@ -526,10 +525,12 @@ function renderAddCoordsLayout(player = null) {
 
         grid.innerHTML += `
             <div class="ac-planet-h-card ${actionClass} ${isMain ? "main-planet-card" : ""}" ${onClickStr}>
-                <span class="ac-planet-title">${planetTitle}</span>
                 
-                <!-- Base en el medio (solo si hay datos) -->
-                ${hqLvlHtml}
+                <!-- Wrapper izquierdo: Título + Base debajo -->
+                <div class="ac-planet-text-wrapper">
+                    <span class="ac-planet-title">${planetTitle}</span>
+                    ${hqLvlHtml}
+                </div>
 
                 <img src="${solarImg}" class="ac-solar-system-img">
             </div>
@@ -641,8 +642,8 @@ async function loadPlayerView(playerName) {
         }
 
         if (!player) {
-            alert("No se pudo cargar la información del jugador.");
-            epcName.innerText = "Error";
+            console.error("No se pudo cargar la información del jugador.");
+            epcName.innerText = "Error (No Encontrado)";
             return;
         }
 
@@ -707,18 +708,36 @@ async function loadPlayerView(playerName) {
             epcAllianceStats.classList.add("hidden"); // Oculta nivel, miembros, wars
         }
 
-        // 6. Generar Grilla de Planetas
+        // 6. Integración de Coordenadas de Google Sheets (Vía Controlador)
+        const coordsCtrl = new CoordinatesController();
+        // Llamamos al controlador con un array de 1 solo miembro
+        const { players: coordinateData } = await coordsCtrl.loadAllianceCoordinates([{ Name: player.Name || playerName }]);
+        const playerSheetData = coordinateData[0] || {};
+
+        // 7. Generar Grilla de Planetas
         if (!player.Planets || player.Planets.length === 0) {
             planetsGrid.innerHTML = `<p class="text-muted" style="grid-column:1/-1;">Este jugador no tiene bases registradas.</p>`;
         } else {
             const colonyColors = ["Planet_blue.png", "Planet_green.png", "Planet_red.png", "Planet_violet.png", "Planet_white.png", "Planet_yellow.png"];
-            const sortedPlanets = [...player.Planets].sort((a, b) => (b.HQLevel || 0) - (a.HQLevel || 0));
+            
+            // Tratamos de buscar la info del sheet por iteración
+            let colonyIndexInSheet = 1;
 
+            const sortedPlanets = [...player.Planets].sort((a, b) => (b.HQLevel || 0) - (a.HQLevel || 0));
             sortedPlanets.slice(0, 24).forEach((planet, index) => {
                 const isMain = index === 0;
                 let planetTitle = isMain ? "Main Planet" : (index === 1 ? "1st Colony" : index === 2 ? "2nd Colony" : index === 3 ? "3rd Colony" : `${index}th Colony`);
                 const hqLvl = planet.HQLevel || 1;
                 const planetImg = isMain ? "Main.png" : colonyColors[(index - 1) % colonyColors.length];
+
+                // Rescatar las coords desde los datos del Sheet
+                let actualCoords = "";
+                if (isMain) {
+                    actualCoords = playerSheetData.mainPlanet || "---";
+                } else {
+                    actualCoords = playerSheetData[`colony${colonyIndexInSheet}`] || "---";
+                    colonyIndexInSheet++;
+                }
 
                 const card = document.createElement("div");
                 card.className = "elite-planet-square";
@@ -732,13 +751,13 @@ async function loadPlayerView(playerName) {
                         <img src="${STARBASE_ICON}" alt="SB">
                         <span>${hqLvl}</span>
                     </div>
-                    <div class="elite-coords-placeholder">123;123</div>
+                    <div class="elite-coords-placeholder ${actualCoords !== '---' ? 'has-coords' : ''}">${actualCoords}</div>
                 `;
 
-                // Acción al dar click: COPIAR coordenadas en vez de abrir modal
+                // Acción al dar click: COPIAR coordenadas si existen
                 card.addEventListener("click", () => {
-                    // Más adelante, aquí leeremos la coordenada real de Google Sheets
-                    const coordsToCopy = "x; y"; 
+                    if (actualCoords === "---") return;
+                    const coordsToCopy = actualCoords;
                     
                     navigator.clipboard.writeText(coordsToCopy).then(() => {
                         const placeholder = card.querySelector('.elite-coords-placeholder');
@@ -836,41 +855,19 @@ async function loadAllianceView(allianceName) {
         title.innerHTML = `<i class="fas fa-shield-alt"></i> ${allianceNameDisplay}`;
 
         // =========================================================
-        // SIMULACIÓN DE GOOGLE SHEETS (Coordenadas formato x;y)
+        // INTEGRACIÓN DE GOOGLE SHEETS (Vía Controlador)
         // =========================================================
-        let coordinateData = members.map((m, index) => {
-            return {
-                Name: m.Name,
-                mainPlanet: `${100 + index};${200 + index}`, // Formato limpio
-                mainHQ: Math.floor(Math.random() * 9) + 1,
-                colony1: index % 2 === 0 ? `${300 + index};${400 + index}` : null,
-                colony1HQ: index % 2 === 0 ? Math.floor(Math.random() * 9) + 1 : null,
-                colony2: index % 4 === 0 ? `${500 + index};${600 + index}` : null,
-                colony2HQ: index % 4 === 0 ? Math.floor(Math.random() * 9) + 1 : null,
-                totalFarm: Math.floor(Math.random() * 50000000),
-                mainFarm: Math.floor(Math.random() * 10000000)
-            };
-        });
-
-        let totalPlanets = 0;
-        let totalFarm = 0;
-        let mainFarm = 0;
-
-        coordinateData.forEach(player => {
-            if (player.mainPlanet) totalPlanets++;
-            for (let i = 1; i <= 11; i++) {
-                if (player[`colony${i}`]) totalPlanets++;
-            }
-            totalFarm += Number(player.totalFarm || 0);
-            mainFarm += Number(player.mainFarm || 0);
-        });
+        const coordsCtrl = new CoordinatesController();
+        const { players: coordinateData, stats } = await coordsCtrl.loadAllianceCoordinates(members);
+        
+        let { totalPlanets, totalFarm, mainFarm } = stats;
 
         // =========================================================
         // FUNCIÓN PARA RENDERIZAR CELDAS DE PLANETAS
         // =========================================================
         const renderPlanetCell = (coords, hqLvl, isMain) => {
             if (!coords || coords === "") {
-                return `<span class="alliance-empty-coordinate">—</span>`;
+                return `<span class="alliance-empty-coordinate"> —</span>`;
             }
 
             const hq = parseInt(hqLvl) || 1; 
@@ -1126,9 +1123,12 @@ function setupSaveModal() {
         const x = document.getElementById("coordX").value.trim();
         const y = document.getElementById("coordY").value.trim();
         
-        if (!x || !y) return alert("Por favor ingresa X e Y.");
+        if (!x || !y) {
+            console.error("Por favor ingresa X e Y.");
+            return;
+        }
 
-        alert("Coordenada enviada a Google Sheets exitosamente.");
+        console.log("Coordenada enviada a Google Sheets exitosamente.");
         closeModal("modalAddCoord");
         document.getElementById("coordX").value = "";
         document.getElementById("coordY").value = "";
@@ -1201,16 +1201,4 @@ function setupMobileMenu() {
         });
     });
 }
-    // Cerrar menú automáticamente al pulsar cualquier botón lateral (y restaurar ícono)
-    document.querySelectorAll(".sidebar-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-            if (window.innerWidth <= 900 && sidebar) {
-                sidebar.classList.remove("active");
-                if (mobileIcon) {
-                    mobileIcon.className = "fas fa-bars";
-                    mobileBtn.style.color = "#00d5ff";
-                    mobileBtn.style.borderColor = "#00d5ff";
-                }
-            }
-        });
-    });
+window.navigate = navigate; window.closeModal = closeModal; window.openModal = openModal;
