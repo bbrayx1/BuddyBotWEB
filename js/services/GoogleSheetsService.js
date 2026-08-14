@@ -74,6 +74,41 @@ export class GoogleSheetsService {
         });
     }
 
+    _showLoading() {
+        const existing = document.getElementById("gs-loading-modal");
+        if (existing) existing.remove();
+        const modalHtml = `
+            <div id="gs-loading-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(12px); text-align: center; font-family: 'Inter', sans-serif;">
+                <style>
+                    @keyframes loadingDots {
+                        0% { content: '.'; }
+                        25% { content: '..'; }
+                        50% { content: '...'; }
+                        75% { content: '..'; }
+                        100% { content: '.'; }
+                    }
+                    .animated-dots::after {
+                        content: '.';
+                        animation: loadingDots 1.5s infinite;
+                        display: inline-block;
+                        text-align: left;
+                        width: 1.5em; /* Evita que el texto salte */
+                    }
+                </style>
+                <img src="https://static.wikia.nocookie.net/omori/images/6/66/Mewo_Sleep_%28White_Space%29.gif/revision/latest?cb=20220208120101" alt="Loading" style="width: 100px; margin-bottom: 20px; image-rendering: pixelated; filter: invert(1);">
+                <h3 style="color: #fff; margin: 0 0 10px 0; font-family: 'Audiowide', cursive; font-size: 1.5rem; letter-spacing: 2px;">Loading<span class="animated-dots"></span></h3>
+                <p style="color: #00d5ff; font-size: 1rem; margin: 0; text-shadow: 0 0 10px rgba(0, 213, 255, 0.5);">Obteniendo coordenadas, por favor espera.</p>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    _hideLoading() {
+        const modal = document.getElementById("gs-loading-modal");
+        if (modal) modal.remove();
+    }
+
+
     /**
      * Obtiene las coordenadas y stats de la base de datos de Google Sheets.
      * @param {Array} members - Lista de miembros para mapear.
