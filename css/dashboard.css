@@ -414,7 +414,6 @@ html, body {
 .alliance-logo { width: 80px; height: 80px; object-fit: contain; filter: drop-shadow(0 0 12px rgba(0, 213, 255, 0.35)); }
 
 .alliance-info-center { border-right: 1px solid rgba(255, 255, 255, 0.1); padding-right: 30px; max-width: 400px; }
-.alliance-name { margin: 0 0 8px 0; color: #ffffff; font-family: 'Audiowide', cursive !important; font-size: 1.8rem; text-transform: none !important; }
 .alliance-description { margin: 0 0 18px 0; color: #a1a1aa; font-size: 0.9rem; line-height: 1.5; }
 
 /* Cajas de Estadísticas (Derecha) */
@@ -475,7 +474,7 @@ html, body {
     flex-direction: column;
     align-items: center;
     flex-shrink: 0;
-    margin-bottom: 4px; /* Da espacio extra abajo para el cuadro de nivel */
+    margin-bottom: 2px; /* Da espacio extra abajo para el cuadro de nivel */
 }
 
 .alliance-player-avatar {

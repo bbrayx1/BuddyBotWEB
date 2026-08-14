@@ -74,9 +74,10 @@ export class GoogleSheetsService {
         });
     }
 
-    _showLoading() {
+    _showLoading(description = "Obteniendo coordenadas, por favor espera.") {
         const existing = document.getElementById("gs-loading-modal");
         if (existing) existing.remove();
+
         const modalHtml = `
             <div id="gs-loading-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(12px); text-align: center; font-family: 'Inter', sans-serif;">
                 <style>
@@ -97,7 +98,7 @@ export class GoogleSheetsService {
                 </style>
                 <img src="https://static.wikia.nocookie.net/omori/images/6/66/Mewo_Sleep_%28White_Space%29.gif/revision/latest?cb=20220208120101" alt="Loading" style="width: 100px; margin-bottom: 20px; image-rendering: pixelated; filter: invert(1);">
                 <h3 style="color: #fff; margin: 0 0 10px 0; font-family: 'Audiowide', cursive; font-size: 1.5rem; letter-spacing: 2px;">Loading<span class="animated-dots"></span></h3>
-                <p style="color: #00d5ff; font-size: 1rem; margin: 0; text-shadow: 0 0 10px rgba(0, 213, 255, 0.5);">Obteniendo coordenadas, por favor espera.</p>
+                <p style="color: #00d5ff; font-size: 1rem; margin: 0; text-shadow: 0 0 10px rgba(0, 213, 255, 0.5);">${description}</p>
             </div>
         `;
         document.body.insertAdjacentHTML('beforeend', modalHtml);
@@ -107,7 +108,6 @@ export class GoogleSheetsService {
         const modal = document.getElementById("gs-loading-modal");
         if (modal) modal.remove();
     }
-
 
     /**
      * Obtiene las coordenadas y stats de la base de datos de Google Sheets.
@@ -124,6 +124,7 @@ export class GoogleSheetsService {
             sessionStorage.setItem('gs_password', this.password);
         }
 
+        this._showLoading("Obteniendo coordenadas desde la base de datos...");
         // Preparamos la lista de jugadores que vamos a solicitar para optimizar la búsqueda
         const requestedPlayers = members.map(m => m.Name);
 
@@ -213,6 +214,8 @@ export class GoogleSheetsService {
             console.error("Error al obtener las coordenadas desde el backend:", error);
             await this._showAlert("Error de comunicación con Google Sheets.");
             return members.map(m => ({ Name: m.Name }));
+        } finally {
+            this._hideLoading();
         }
     }
 
@@ -221,7 +224,16 @@ export class GoogleSheetsService {
      * @param {Object} coordinateData 
      */
     async addCoordinate(coordinateData) {
-        console.log("Para guardar, debes crear una acción específica en tu Apps Script.");
-        return true;
+        this._showLoading("Guardando coordenada, por favor espera...");
+        try {
+            console.log("Para guardar, debes crear una acción específica en tu Apps Script.");
+            await new Promise(resolve => setTimeout(resolve, 1000)); // Simulamos carga
+            return true;
+        } catch(err) {
+            console.error("Error guardando coordenada:", err);
+            return false;
+        } finally {
+            this._hideLoading();
+        }
     }
 }

@@ -370,3 +370,281 @@ a {
 .floating-command { position: fixed; bottom: 40px; right: 40px; background: linear-gradient(90deg, #1f2029, #2b1f2b); border: 1px solid #4a2a3f; padding: 12px 20px; border-radius: 20px; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; }
 .cmd-icon { color: #a1a1aa; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; font-family: monospace; }
 .cmd-text { font-size: 0.9rem; color: var(--text-muted); }
+/* ========================================== */
+/* ESTILOS DE VISTA ALIANZA Y COORDENADAS     */
+/* ========================================== */
+
+/* HEADER ALIANZA */
+.alliance-detail-container {
+    padding: 20px;
+    background: var(--bg-main);
+    border-radius: 12px;
+}
+.alliance-header-section {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.alliance-main-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    text-align: left;
+}
+.alliance-logo {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(0, 213, 255, 0.3));
+}
+.alliance-text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.alliance-name {
+    padding-top: 8px;
+    font-family: 'Audiowide', cursive;
+    font-size: 2rem;
+    color: #fff;
+    margin: 0;
+}
+.alliance-description {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* STATS GRID */
+.alliance-stats-grid {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+.alliance-stat-box {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 15px 20px;
+    border-radius: 10px;
+    flex: 1;
+    min-width: 180px;
+}
+.alliance-stat-box img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.stat-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: 'Audiowide', cursive;
+}
+
+/* DB SECTION */
+.alliance-section-title {
+    font-family: 'Audiowide', cursive;
+    font-size: 1.4rem;
+    color: #00d5ff;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.alliance-db-stats {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+.alliance-db-card {
+    background: linear-gradient(145deg, rgba(24, 25, 30, 0.8), rgba(39, 39, 47, 0.4));
+    border: 1px solid rgba(0, 213, 255, 0.1);
+    padding: 10px;
+    border-radius: 10px;
+    flex: 1;
+    min-width: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.alliance-db-label {
+    font-size: 0.9rem;
+    color: #a1a1aa;
+    text-transform: uppercase;
+}
+.alliance-db-value {
+    font-size: 1.8rem;
+    color: #00d5ff;
+    font-weight: bold;
+    font-family: 'Audiowide', cursive;
+    text-shadow: 0 0 10px rgba(0, 213, 255, 0.4);
+}
+
+/* TABLE STYLES */
+.alliance-table-wrapper {
+    overflow-x: auto;
+    background: #18191e;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+.alliance-coordinates-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+.alliance-coordinates-table th {
+    background: #1e1e24;
+    padding: 15px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+    white-space: nowrap;
+    border-bottom: 2px solid rgba(0, 213, 255, 0.2);
+}
+.alliance-coordinates-table td {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    vertical-align: middle;
+}
+.alliance-coordinates-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* PLAYER CELL IN TABLE */
+.alliance-player-cell {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 220px;
+}
+.alliance-avatar-wrapper {
+    position: relative;
+    display: inline-block;
+}
+.alliance-player-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 213, 255, 0.4);
+    object-fit: cover;
+    display: block;
+}
+.alliance-player-level {
+    font-family: 'Nasalization', sans-serif;
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #18191e;
+    border: 1px solid #00d5ff66;
+    border-radius: 8px;
+    padding: 1.5px 4px;
+    font-size: 0.65rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    white-space: nowrap;
+    z-index: 2;
+}
+.alliance-player-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.player-name {
+    font-weight: 600;
+    color: #fff;
+    font-size: 1.05rem;
+}
+.player-badges {
+    margin-top: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.player-role {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.role-0 { background: rgba(200, 10, 180, 0.2); color: #ff57ff; border: 1px solid rgba(200, 10, 180, 0.5); }
+.role-1 { background: rgba(0, 213, 255, 0.2); color: #00d5ff; border: 1px solid rgba(0, 213, 255, 0.5); }
+.role-2 { background: rgba(255, 255, 255, 0.1); color: #ccc; border: 1px solid rgba(255, 255, 255, 0.2); }
+
+/* PLANET CELL IN TABLE */
+.planet-cell-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 130px;
+}
+.planet-visual {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.planet-visual img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+.planet-hq {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: #000;
+    border: 1px solid #0a23c862;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: bold;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.planet-coords {
+    font-family: monospace;
+    font-size: 0.95rem;
+    color: #e4e4e7;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 3px 6px;
+    border-radius: 4px;
+}
+.alliance-empty-coordinate {
+    color: var(--text-muted);
+    font-style: italic;
+    opacity: 0.5;
+}
